@@ -1,0 +1,167 @@
+html, body {
+  padding:0;
+  margin:0;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+ul,li,dl,dd,p{
+  margin:0;
+  padding:0;
+}
+a{
+  font-size:12px;
+  text-decoration: none;
+}
+li{
+  list-style:none;
+}
+i{
+  font-style: normal;
+}
+h1,h5{
+  font-weight: normal;
+}
+.opacity0{
+　opacity:0;
+　filter:alpha(opacity=0);
+}
+/*布局*/
+.justify{
+  text-align:justify;
+  text-justify:inter-word;
+}
+.center{
+  text-align:center;
+}
+.text-r{
+  text-align:right
+}
+.text-l{
+  text-align:left;
+}
+.block{
+  display: block;
+}
+.in-block{
+  display:inline-block;
+}
+/*一行省略号*/
+.ellipsis{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+/*两行省略*/
+.ellipsis2{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.pltr15{
+  padding:15px 15px 0 15px;
+}
+.p15{
+  padding:15px;
+}
+.plr15{
+  padding-left:15px;
+  padding-right:15px;
+}
+.plr10{
+  padding-left:10px;
+  padding-right:10px;
+}
+.pl15{
+  padding-left:15px;
+}
+.pr15{
+  padding-right:15px;
+}
+.pr10{
+  padding-right:10px;
+}
+.pt10{
+  padding-top:10px;
+}
+.pt15{
+  padding-top:15px;
+}
+.pb15{
+  padding-bottom:15px;
+}
+.ptb15{
+  padding-top:15px;
+  padding-bottom:15px;
+}
+.m15{
+  margin:15px;
+}
+.mb10{
+  margin-bottom:10px;
+}
+.radius50{
+  -webkit-border-radius:50%;
+  -moz-border-radius:50%;
+  border-radius:50%;
+}
+.bgfff{
+  background:#fff;
+}
+.fl{ float: left;}
+.fr{ float: right;}
+.clear{ clear: both;}
+.flex{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.flex1{
+  -prefix-box-flex: 1;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -moz-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.flex-c{
+  -webkit-box-direction: normal;
+  -webkit-box-orient: vertical;
+  -moz-flex-direction: column;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+}
+.flex-r{
+  -webkit-box-direction: normal;
+  -webkit-box-orient: vertical;
+  -moz-flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+}
+.flex-a-c{
+  -webkit-flex-flow: row wrap;
+  -ms-flex-flow: row wrap;
+  flex-flow: row wrap;
+  -webkit-align-content: flex-start;
+  -ms-flex-line-pack: start;
+  align-content: center;
+}
+.flex-j-c{
+  -webkit-box-pack: center;
+  -moz-justify-content: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+.flex-a-i{
+  -webkit-box-align: center;
+  -moz-align-items: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+
+
+
