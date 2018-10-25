@@ -13,7 +13,7 @@
             </template>
             <el-menu-item-group>
               <el-menu-item index="/video/list">视频列表</el-menu-item>
-              <el-menu-item index="1-2">视频编辑</el-menu-item>
+              <!-- <el-menu-item index="1-2">视频编辑</el-menu-item> -->
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="2">
@@ -21,7 +21,7 @@
               <span class="menu-title">会员</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="2-1">会员列表</el-menu-item>
+              <el-menu-item index="/member/list">会员列表</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="3">
@@ -29,10 +29,10 @@
               <span class="menu-title">运营</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="3-1">banner管理</el-menu-item>
+              <el-menu-item index="/operation/bannerlist">banner管理</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
-              <el-menu-item index="3-1">Icon管理</el-menu-item>
+              <el-menu-item index="/operation/classify">分类管理</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
               <el-menu-item index="3-1">邀请好友</el-menu-item>
@@ -68,14 +68,24 @@ export default {
   .tac{
     height:calc(100% - 60px);
     overflow:auto;
+    text-align: center;
   }
   .el-menu-vertical{
     overflow:hidden;
     padding-bottom:50px;
   }
+  /* .el-menu-vertical >>> .el-submenu__title{
+    padding:0;
+    padding-left:0 !important;
+  } */
   .menu-title{
     font-size:15px;
+    font-weight: bold;
     color:#222;
+    display:block;
+    width:100%;
+    height:100%;
+    /* background-color: rgb(230, 230, 230); */
   }
   .el-submenu .el-menu-item:first-child{
     margin-top:-14px;

@@ -26,8 +26,35 @@ export default new Router({
       component: components('common/Main'),
       children: [
         {
+          path: '/',
+          component: components('video/Vlist')
+        },
+        {
           path: '/video/list',
-          component: components('video/List')
+          component: components('video/Vlist')
+        },
+        {
+          path: '/member/list',
+          component: components('member/Mlist')
+        },
+        {
+          path: '/member/add/:id',
+          name: 'Add',
+          component: components('member/Add')
+        },
+        {
+          path: '/operation/bannerlist',
+          component: components('operation/BannerList')
+        },
+        {
+          path: '/operation/banadd/:id',
+          name: 'BanAdd',
+          component: components('operation/BanAdd')
+        },
+        {
+          path: '/operation/classify',
+          name: 'Classify',
+          component: components('operation/Classify')
         }
       ]
     }

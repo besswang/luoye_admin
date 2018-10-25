@@ -101,6 +101,9 @@ h1,h5{
 .mb10{
   margin-bottom:10px;
 }
+.mb15{
+  margin-bottom:15px;
+}
 .radius50{
   -webkit-border-radius:50%;
   -moz-border-radius:50%;
