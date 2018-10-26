@@ -33,6 +33,11 @@ export default new Router({
           path: '/video/list',
           component: components('video/Vlist')
         },
+        {// 添加视频
+          path: '/video/addvlist',
+          name: 'AddVlist',
+          component: components('video/AddVlist')
+        },
         {
           path: '/member/list',
           component: components('member/Mlist')

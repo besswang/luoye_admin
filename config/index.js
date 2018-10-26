@@ -10,7 +10,30 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/luoye_admin':{
+        target: 'http://192.168.0.139:80/luoye_admin',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/luoye_admin':''
+        }
+      }
+      // '/api':{
+      //   target: 'http://192.168.0.139:80',
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '^/api':'/'
+      //   }
+      // }
+      // '/tbt_user':{
+      //   target: 'http://47.98.216.251:80/tbt_user',//测试线
+      //   changeOrigin: true,
+      //   secure: false,
+      //   pathRewrite: {
+      //     '^/tbt_user': ''
+      //   }
+      // }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
