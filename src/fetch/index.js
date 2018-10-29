@@ -1,5 +1,6 @@
 // 处理promise和fetch的兼容性以及引入
 // import queryString from 'query-string'
+// import qs from 'qs'
 require('es6-promise').polyfill()
 // import 'whatwg-fetch'
 require('whatwg-fetch')
@@ -22,7 +23,7 @@ const formatUrl = obj => {
  */
 const Fetch = (url, option = {}) => {
   // 设置请求超时的时间，默认10秒
-  const timeout = option.timeout || 10000
+  const timeout = option.timeout || 30000
   option.headers = option.headers || headers
   option.headers['token'] = `${window.localStorage.getItem('token')}`
   option.method = (option.method || 'get').toLocaleLowerCase()
@@ -36,15 +37,15 @@ const Fetch = (url, option = {}) => {
   // 对非get类请求头和请求体做处理
   if (option.method === 'post' || option.method === 'put' || option.method === 'delete') {
     // option.headers['Content-Type'] = option.headers['Content-Type'] || 'application/json'
-    option.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    // option.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    // option.headers['Content-Type'] = 'multipart/form-data'
     // 非get类请求传参时，需要将参数挂在body上
-    option.body = JSON.stringify(option.body)
+    // option.body = JSON.stringify(option.body)
     // option.body = queryString.stringify(option.body)
     // 根据后台要求，如果有时候是java请求会用qs转
-    // option.body = qs.stringify(option.data)
+    // option.body = qs.stringify(option.body)
   }
   delete option.data
-
   return addTimeout(fetch(tHost + url, option), timeout)
 }
 

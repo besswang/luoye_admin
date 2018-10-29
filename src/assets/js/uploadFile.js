@@ -1,3 +1,4 @@
+// https://www.liangzl.com/get-article-detail-8982.html
 // uploadFile.js
 import Vue from 'vue'
 import SparkMD5 from 'spark-md5'
@@ -10,27 +11,10 @@ export default function () {
       // 存储文件的md5码
       file.md5 = md5
       // 拿md5码查询后台数据库是否存在此md5码，如果存在则无需上传
-      // handleAjax为封装好的ajax方法
-      // this.handleAjax('api/doc/file/getFileByMd5', {
-      //   md5,
-      //   name: file.name
-      // }, res => {
-      //   if (!res.data) { // 不存在
-      //     // 开始上传文件
-      //     uploadChunk(this, file, 0, backtopage)
-      //   } else { // 秒传
-      //     // 文件上传成功
-      //     backtopage && backtopage()
-      //   }
-      // })
-      console.log('md5结果')
-      console.log(md5)
       this.$Fetch(`video/checkPart/${md5}`, {method: 'post', body: {MD5Key: md5}})
         .then((res) => {
-          console.log('看res')
-          console.log(res)
           if (!res.data) {
-            uploadChunk(this, file, 0, backtopage)
+            uploadChunk(this, file, 1, backtopage)
           } else {
             // 文件上传成功
             backtopage && backtopage()
@@ -66,7 +50,7 @@ export default function () {
           currentChunk++
           if (currentChunk < chunks) {
             console.log('这里会继续下一块')
-            // loadNext() // 继续切割下一块文件
+            loadNext() // 继续切割下一块文件
           } else {
             // 文件上传成功
             backtopage && backtopage()
@@ -95,35 +79,41 @@ export default function () {
     function loadNext () {
       // 查询后台判断当前块文件有没有上传，如果已经上传则不需要上传，继续读取下一块,upload.md5
       // that.$Fetch('api/common/file/checkChunk', { md5: file.md5, chunk: currentChunk }, res => {
-      console.log(file, file.md5, currentChunk, chunks)
+      // console.log(file, file.md5, currentChunk, chunks)
       let fetchForm = new FormData()
       fetchForm.append('MD5Key', file.md5)
       fetchForm.append('part', currentChunk)
       fetchForm.append('file', file)
       fetchForm.append('totalPart', chunks)
       fetchForm.append('GUID', file.uid)
-      that.$Fetch('video/upload', {method: 'post', body: {MD5Key: file.md5, part: currentChunk, file: file, totalPart: chunks, GUID: file.uid}}, res => {
+      // that.$Fetch('video/upload', {method: 'post', body: jsObj, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}, res => {
+      // that.$Fetch('video/upload', {method: 'post', body: {MD5Key: file.md5, part: currentChunk, file: file, totalPart: chunks, GUID: file.uid}, headers: {'Content-Type': 'multipart/form-data'}}, res => {
+      // that.$Fetch('video/upload', {method: 'post', body: {MD5Key: file.md5, part: currentChunk, file: file, totalPart: chunks, GUID: file.uid}}, res => {
+      // that.$Fetch('video/upload', {method: 'post', body: fetchForm, headers: {'Content-Type': 'multipart/form-data'}}, res => {
       // that.$Fetch('video/upload', {method: 'post', body: fetchForm}, res => {
-        // 后台返回没有上传过
-        if (res.data === false) {
-          // 计算切割文件的开始索引和结束索引
-          var start = currentChunk * chunkSize
-          var end = Math.min(start + chunkSize, file.size)
-          // 切割文件并触发fileReader.onload
-          fileReader.readAsArrayBuffer(file.slice(start, end))
-          // 后台返回此块已经上传过，递归调用loadNext，继续判断下一块文件块
-        } else {
-          currentChunk++
-          if (currentChunk < chunks) {
-            loadNext()
+      that.$Fetch('/video/upload', {method: 'post', body: fetchForm})
+        .then((response) => {
+          console.log(response)
+          // if (res.data === false) {
+          //   // 计算切割文件的开始索引和结束索引
+          //   var start = currentChunk * chunkSize
+          //   var end = Math.min(start + chunkSize, file.size)
+          //   // 切割文件并触发fileReader.onload
+          //   fileReader.readAsArrayBuffer(file.slice(start, end))
+          //   // 后台返回此块已经上传过，递归调用loadNext，继续判断下一块文件块
+          // } else {
+          //   currentChunk++
+          //   if (currentChunk < chunks) {
+          //     loadNext()
+          //   }
+          // }
+        })
+        .catch(function (error) {
+          console.log(error)
+          if (error) {
+            console.log(error.msg)
           }
-        }
-      }, err => {
-        // 文件上传出错
-        if (err) {
-          console.log('文件上传出错')
-        }
-      })
+        })
     }
     // 触发文件第一块上传
     loadNext()
@@ -138,13 +128,11 @@ export default function () {
     var currentChunk = 1
     // 创建md5对象（基于SparkMD5）
     var spark = new SparkMD5()
-    console.log(spark)
     // 每块文件读取完毕之后的处理
     fileReader.onload = function (e) {
       // 每块交由sparkMD5进行计算
       spark.appendBinary(e.target.result)
       currentChunk++
-      console.log(currentChunk)
       // 如果文件处理完成计算MD5，如果还有分片继续处理
       if (currentChunk < chunks) {
         loadNext()

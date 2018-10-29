@@ -60,6 +60,31 @@ export default new Router({
           path: '/operation/classify',
           name: 'Classify',
           component: components('operation/Classify')
+        },
+        {
+          path: '/operation/invite', // 邀请好友
+          name: 'Invite',
+          component: components('operation/Invite')
+        },
+        {
+          path: '/operation/wd', // 观看和下载
+          name: 'Wd',
+          component: components('operation/Wd')
+        },
+        {
+          path: '/operation/wd/issue', // 手工发放次数
+          name: 'Issue',
+          component: components('operation/WdIssue')
+        },
+        {
+          path: '/operation/domain', // 域名管理
+          name: 'Domain',
+          component: components('operation/Domain')
+        },
+        {
+          path: '/operation/basic', // 基础定义
+          name: 'Basic',
+          component: components('operation/Basic')
         }
       ]
     }

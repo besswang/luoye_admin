@@ -1,23 +1,26 @@
 <template>
-  <div id="Mlist">
+  <div id="Wd">
     <el-row>
-      <el-col :span="22">
+      <el-col :span="21">
         <el-form ref="form" :model="MlistForm" :inline="true">
+          <el-form-item>
+            <el-input v-model="MlistForm.name" placeholder="输入会员编号"></el-input>
+          </el-form-item>
           <el-form-item>
             <el-select v-model="state" @change="selectChange">
               <el-option v-for="(v,i) in types" :key="i" :value="v"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-input v-model="MlistForm.name" placeholder="邮箱/昵称"></el-input>
+            <el-button type="primary" @click="onSubmit">搜索</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">搜索</el-button>
+            <el-button type="primary" @click="dialogFormVisible = true">开启不限次数观看</el-button>
           </el-form-item>
         </el-form>
       </el-col>
-      <el-col :span="2" class="text-r">
-        <el-button type="primary" @click="addFn">添加</el-button>
+      <el-col :span="3" class="text-r">
+        <el-button type="primary" @click="WdIssue">手工发放次数</el-button>
       </el-col>
     </el-row>
     <el-table
@@ -33,39 +36,46 @@
       <el-table-column
         align="center"
         property="tel"
-        label="邮箱">
+        label="会员账号">
       </el-table-column>
       <el-table-column
         align="center"
         property="name"
-        label="昵称">
+        label="行为">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        property="bonum"
+        label="观看次数">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        property="bonum"
+        label="下载次数">
       </el-table-column>
       <el-table-column
         align="center"
         property="date"
-        label="最后一次登陆时间">
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="260">
-        <template slot-scope="scope">
-          <el-row class="flex flex-a-i">
-            <el-col :span="12">
-              <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
-              <el-button size="mini" type="primary" @click.native="editFn(scope.row.id)">编辑</el-button>
-            </el-col>
-            <el-col :span="12">
-              <el-switch
-                style="display: block"
-                v-model="scope.row.freeze"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-                active-text="解冻"
-                inactive-text="冻结">
-              </el-switch>
-            </el-col>
-          </el-row>
-        </template>
+        label="操作时间">
       </el-table-column>
     </el-table>
+    <el-dialog title='开启不限次数观看' :visible.sync="dialogFormVisible">
+      <el-form ref="form" :model="BanForm" :inline="true">
+        <el-form-item>
+          <el-date-picker
+            v-model="BanForm.time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
     <div class="text-r ptb15">
       <el-pagination
         @size-change="handleSizeChange"
@@ -82,12 +92,16 @@
 
 <script>
 export default {
-  name: 'Mlist',
+  name: 'Wd',
   data () {
     return {
+      BanForm: {
+        time: ''
+      },
+      dialogFormVisible: false,
       currentPage4: 4,
-      types: ['所有状态', '冻结', '未冻结'],
-      state: '所有状态',
+      types: ['选择类型', '登陆', '注册', '手工发放', '后台发放'],
+      state: '选择类型',
       MlistForm: {
         stateValue: '',
         name: ''
@@ -96,7 +110,7 @@ export default {
         id: 1,
         date: '2016-05-02',
         tel: '15057187176',
-        name: '王小虎',
+        name: '注册',
         img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
         title: '上海市普陀区金沙江路 1518 弄',
         bonum: '10',
@@ -106,7 +120,7 @@ export default {
         id: 2,
         date: '2016-05-04',
         tel: '15057187177',
-        name: '王小虎',
+        name: '批量发放',
         img: 'http://img1.3lian.com/2015/a1/63/d/121.jpg',
         title: '上海市普陀区金沙江路 1517 弄',
         bonum: '20',
@@ -116,6 +130,10 @@ export default {
     }
   },
   methods: {
+    // 手工发放次数
+    WdIssue () {
+      this.$router.push('/operation/wd/issue')
+    },
     // 编辑
     editFn (id) {
       this.$router.push({

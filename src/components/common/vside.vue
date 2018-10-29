@@ -35,16 +35,16 @@
               <el-menu-item index="/operation/classify">分类管理</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
-              <el-menu-item index="3-1">邀请好友</el-menu-item>
+              <el-menu-item index="/operation/invite">邀请好友</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
-              <el-menu-item index="3-1">观看和下载</el-menu-item>
+              <el-menu-item index="/operation/wd">观看和下载</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
-              <el-menu-item index="3-1">域名管理</el-menu-item>
+              <el-menu-item index="/operation/domain">域名管理</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
-              <el-menu-item index="3-1">基础定义</el-menu-item>
+              <el-menu-item index="/operation/basic">基础定义</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
         </el-menu>

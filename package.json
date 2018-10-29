@@ -14,8 +14,10 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "element-ui": "^2.4.8",
     "es6-promise": "^4.2.5",
+    "qs": "^6.5.2",
     "query-string": "^6.2.0",
     "spark-md5": "^3.0.0",
     "vue": "^2.5.2",

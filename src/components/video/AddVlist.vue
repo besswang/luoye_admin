@@ -28,7 +28,9 @@
         <!-- /video/upload -->
       <el-upload
         class="upload-demo"
-        action="https://jsonplaceholder.typicode.com/posts/"
+        action="http://192.168.0.139/luoye_admin/video/upload"
+        :headers="headersObj"
+        accept="video/*"
         :on-preview="handlePreview"
         :on-remove="handleRemove"
         :file-list="fileList2"
@@ -43,14 +45,6 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
-    <el-button @click.native="fetchFn">测试fetch</el-button>
-    <br>
-    <template>
-      <el-button size="small" type="primary" @click="file">点击上传</el-button>
-      <label ref="upload" style="position: relative;">
-        <input type="file" @change="selectFile" style="position: absolute; width: 1px; height: 1px; opacity: 0; z-index: -1;">
-      </label>
-    </template>
   </div>
 </template>
 
@@ -59,6 +53,9 @@ export default {
   name: 'AddVlist',
   data () {
     return {
+      headersObj: {
+        'Content-Type': 'multipart/form-data'
+      },
       fileList2: [
         {
           name: 'food.jpeg',
@@ -92,38 +89,17 @@ export default {
 
   },
   methods: {
-    file () {
-      // 模拟点击file input触发选择文件，注意：不能在任何方式的回调里面执行此语句
-      this.$refs.upload.click()
-    },
-    selectFile (event) {
-      // 调用上传方法，传入选择的文件对象
-      this.uploadFile(event.target.files[0], () => {
-        // upload-success
-      })
-      // 重置file input控件的值
-      event.target.value = ''
-    },
-    // fetchFn () {
-    //   this.$Fetch('video/upload', {method: 'post'})
-    //     .then((res) => {
-    //       console.log(res)
-    //     })
-    // },
     // 图片上传-上传之前
     beforeUpload (file) {
-      // console.log(file)
       // const chunkSize = 4 * 1024 * 1024 // 4MB一片
       // const chunkCount = Math.ceil(file.size / chunkSize) // 总片数
       // console.log(chunkSize, chunkCount)
-      console.log('上传之前的动作')
       // const isLt10M = file.size / 1024 / 1024  < 10
       // if (['video/mp4', 'video/ogg', 'video/flv','video/avi','video/wmv','video/rmvb'].indexOf(file.type) == -1) {
       if (['video/mp4'].indexOf(file.type) === -1) {
         this.$message.error('请上传正确的视频格式')
         return false
       }
-      console.log(file)
       this.uploadFile(file)
       // if (!isLt10M) {
     //     this.$message.error('上传视频大小不能超过10MB哦!')
