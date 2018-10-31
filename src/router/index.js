@@ -22,7 +22,6 @@ export default new Router({
     },
     {
       path: '/main',
-      name: 'Main',
       component: components('common/Main'),
       children: [
         {
@@ -37,6 +36,11 @@ export default new Router({
           path: '/video/addvlist',
           name: 'AddVlist',
           component: components('video/AddVlist')
+        },
+        {// 添加视频weuuploader
+          path: '/video/addvlistweb',
+          name: 'AddVlistweb',
+          component: components('video/AddVlistWeb')
         },
         {
           path: '/member/list',

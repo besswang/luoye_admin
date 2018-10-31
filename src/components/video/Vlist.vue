@@ -2,6 +2,9 @@
   <div id="Vlist">
     <div class="text-r">
       <el-button type="primary" @click.native="addvlistFn">添加视频</el-button>
+      <router-link to="/video/addvlistweb">
+        <el-button type="primary">添加视频webuploader</el-button>
+      </router-link>
     </div>
     <el-table
     :data="tableData"

@@ -19,6 +19,7 @@
         <!-- <el-upload
           class="avatar-uploader"
           action="https://jsonplaceholder.typicode.com/posts/"
+          http://192.168.0.139/luoye_admin/video/upload
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload">
@@ -28,7 +29,7 @@
         <!-- /video/upload -->
       <el-upload
         class="upload-demo"
-        action="http://192.168.0.139/luoye_admin/video/upload"
+        action="https://jsonplaceholder.typicode.com/posts/"
         :headers="headersObj"
         accept="video/*"
         :on-preview="handlePreview"
@@ -45,6 +46,18 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
+  <uploader :options="options" class="uploader-example" ref="uploader"
+  @file-complete="fileComplete"
+  @complete="complete"
+  @file-success="fileSuccess"
+  @file-added="fileAdded"
+  @file-progress="fileProgress">
+    <uploader-unsupport></uploader-unsupport>
+    <uploader-drop>
+      <uploader-btn :attrs="attrs">点击上传</uploader-btn>
+    </uploader-drop>
+    <uploader-list></uploader-list>
+  </uploader>
   </div>
 </template>
 
@@ -53,6 +66,18 @@ export default {
   name: 'AddVlist',
   data () {
     return {
+      options: {
+        target: 'http://192.168.0.139/luoye_admin/video/upload', // 'POST请求的目标URL',
+        chunkSize: 4 * 1024 * 1024, // 每个上传的数据块的大小
+        forceChunkSize: true, // 强制所有块都小于或等于chunkSize
+        testChunks: false // 向服务器发出每个块的GET请求，以查看它是否已存在。如果在服务器端实现，即使在浏览器崩溃甚至计算机重启后，这也将允许上传恢复。（默认值：true）
+        // preprocess: function () {
+        //   console.log('666666')
+        // }
+      },
+      attrs: {
+        accept: 'video/*'
+      },
       headersObj: {
         'Content-Type': 'multipart/form-data'
       },
@@ -86,9 +111,36 @@ export default {
     }
   },
   mounted () {
-
+    console.log(Math.max(54, 545, 2165, 545, 56))
+    console.log(Math.min(54, 545, 2165, 545, 56))
+    this.$nextTick(() => {
+      window.uploader = this.$refs.uploader.uploader
+    })
   },
   methods: {
+    // 上传特定文件的进度
+    fileProgress (rootFile, file, chunk) {
+      // console.log(rootFile, file, chunk)
+    },
+    // 此事件用于文件验证。拒绝此文件返回false
+    fileAdded (file, event) {
+      console.log(arguments)
+      // console.log(file, event)
+      // console.log(file.chunks)
+    },
+    // 上传成功的事件
+    fileSuccess (rootFile, file, message, chunk) {
+      // console.log('complete', rootFile, file, message, chunk)
+    },
+    // 根文件（文件夹）已完成。
+    fileComplete (rootFile) {
+      // console.log('file complete', arguments)
+      // console.log(rootFile)
+    },
+    // 上传完成。
+    complete () {
+      // console.log('complete', arguments)
+    },
     // 图片上传-上传之前
     beforeUpload (file) {
       // const chunkSize = 4 * 1024 * 1024 // 4MB一片
@@ -154,5 +206,21 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .uploader-example {
+    width: 880px;
+    padding: 15px;
+    margin: 40px auto 0;
+    font-size: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+  }
+  .uploader-example .uploader-btn {
+    margin-right: 4px;
+  }
+  .uploader-example .uploader-list {
+    max-height: 440px;
+    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 </style>
