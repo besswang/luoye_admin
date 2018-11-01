@@ -1,11 +1,8 @@
+import 'whatwg-fetch'
 // 处理promise和fetch的兼容性以及引入
-// import queryString from 'query-string'
-// import qs from 'qs'
 require('es6-promise').polyfill()
-// import 'whatwg-fetch'
-require('whatwg-fetch')
-// 前置拼接url,process.env.tbtHost取的是config--dev.env.js--tbtHost
-const tHost = process.env.tbtHost && process.env.tbtHost.url
+// 前置拼接url,process.env.luoHost取的是config--dev.env.js--tbtHost
+const luoHost = process.env.luoHost && process.env.luoHost.url
 // 自定义headers
 const headers = {
   'Accept': 'application/json; version=3.13.0'
@@ -25,7 +22,7 @@ const Fetch = (url, option = {}) => {
   // 设置请求超时的时间，默认10秒
   const timeout = option.timeout || 30000
   option.headers = option.headers || headers
-  option.headers['token'] = `${window.localStorage.getItem('token')}`
+  option.headers['token'] = `${window.sessionStorage.getItem('token')}`
   option.method = (option.method || 'get').toLocaleLowerCase()
   // 格式化get请求的数据(fetch的get请求需要需要将参数拼接到url后面)
   if (option.method === 'get') {
@@ -36,17 +33,11 @@ const Fetch = (url, option = {}) => {
 
   // 对非get类请求头和请求体做处理
   if (option.method === 'post' || option.method === 'put' || option.method === 'delete') {
-    // option.headers['Content-Type'] = option.headers['Content-Type'] || 'application/json'
-    // option.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    // option.headers['Content-Type'] = 'multipart/form-data'
-    // 非get类请求传参时，需要将参数挂在body上
-    // option.body = JSON.stringify(option.body)
-    // option.body = queryString.stringify(option.body)
-    // 根据后台要求，如果有时候是java请求会用qs转
-    // option.body = qs.stringify(option.body)
+    option.headers['Content-Type'] = option.headers['Content-Type'] || 'application/json'
+    option.body = JSON.stringify(option.body)
   }
   delete option.data
-  return addTimeout(fetch(tHost + url, option), timeout)
+  return addTimeout(fetch(luoHost + url, option), timeout)
 }
 
 // 对请求结果进行处理：fetch请求成功后返回的是json对象
@@ -98,7 +89,11 @@ function addTimeout (fetchPromise, timeout) {
         response.status = status
         // 如果返回码在300到900之间，将以错误返回，如果需要对错误统一处理，可以放在下面判断中
         if (/^[3-9]\d{2}$/.test(response.status) || !response.success || response.code === 400) {
-          // vm.$vux.toast.text(response.msg, 'top')
+          /* global vm */
+          vm.$message({
+            message: response.msg,
+            type: 'warning'
+          })
           reject(response)
           return false
         } else {

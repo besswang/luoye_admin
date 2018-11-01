@@ -20,7 +20,7 @@
       </div>
     </div>
     <vue-upload
-      url='/luoye_admin/video/upload'
+      url='http://192.168.0.139/luoye_admin/video/upload'
       accept='video'
       ref="uploader"
       uploadButton="#filePicker"

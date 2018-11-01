@@ -10,10 +10,10 @@ export default new Router({
       name: 'Login',
       component: components('user/Login')
     },
-    {
-      path: '/forget',
-      name: 'Forget',
-      component: components('user/Forget')
+    {// 修改密码
+      path: '/amend',
+      name: 'Amend',
+      component: components('user/Amend')
     },
     {
       path: '/register',
@@ -31,11 +31,6 @@ export default new Router({
         {
           path: '/video/list',
           component: components('video/Vlist')
-        },
-        {// 添加视频
-          path: '/video/addvlist',
-          name: 'AddVlist',
-          component: components('video/AddVlist')
         },
         {// 添加视频weuuploader
           path: '/video/addvlistweb',
