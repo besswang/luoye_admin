@@ -41,8 +41,13 @@ export default new Router({
           path: '/member/list',
           component: components('member/Mlist')
         },
+        // {
+        //   path: '/member/add/:id',
+        //   name: 'Add',
+        //   component: components('member/Add')
+        // },
         {
-          path: '/member/add/:id',
+          path: '/member/add',
           name: 'Add',
           component: components('member/Add')
         },

@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from './modules/user'
-import project from './modules/project'
+import member from './modules/member'
+import operation from './modules/operation'
 import getters from './getters'
 Vue.use(Vuex)
 const state = {
@@ -18,7 +19,8 @@ const index = new Vuex.Store({
   getters,
   modules: {
     user,
-    project
+    member,
+    operation
   }
 })
 export default index

@@ -24,13 +24,6 @@ import { mapActions } from 'vuex'
 export default {
   name: 'Amend',
   data () {
-    var oldPasswordFn = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('密码不能为空'))
-      } else {
-        callback()
-      }
-    }
     var passwordFn = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入新密码'))
@@ -64,7 +57,7 @@ export default {
           { validator: checkPasswordFn, trigger: 'blur' }
         ],
         oldPassword: [
-          { validator: oldPasswordFn, trigger: 'blur' }
+          { validator: this.$global.valiPass, trigger: 'blur' }
         ]
       }
     }

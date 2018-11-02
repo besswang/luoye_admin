@@ -2,17 +2,17 @@
   <div id="Mlist">
     <el-row>
       <el-col :span="22">
-        <el-form ref="form" :model="MlistForm" :inline="true">
+        <el-form ref="form" :inline="true">
           <el-form-item>
-            <el-select v-model="state" @change="selectChange">
-              <el-option v-for="(v,i) in types" :key="i" :value="v"></el-option>
+            <el-select v-model="status">
+              <el-option v-for="(v,i) in types" :key="i" :value="v.value" :label="v.label"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-input v-model="MlistForm.name" placeholder="邮箱/昵称"></el-input>
+            <el-input v-model="info" placeholder="用户名/昵称"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">搜索</el-button>
+            <el-button type="primary" @click.native="searchFn">搜索</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -21,6 +21,7 @@
       </el-col>
     </el-row>
     <el-table
+    v-loading="loading"
     :data="tableData"
     style="width: 100%"
     highlight-current-row>
@@ -32,30 +33,34 @@
       </el-table-column>
       <el-table-column
         align="center"
-        property="tel"
-        label="邮箱">
+        property="userName"
+        label="用户名">
       </el-table-column>
       <el-table-column
         align="center"
-        property="name"
+        property="nickName"
         label="昵称">
       </el-table-column>
       <el-table-column
         align="center"
-        property="date"
         label="最后一次登陆时间">
+        <template slot-scope="scope">
+          {{timeFn(scope.row.lastLoginTime)}}
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="260">
         <template slot-scope="scope">
-          <el-row class="flex flex-a-i">
-            <el-col :span="12">
-              <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
+          <el-row class="flex flex-a-c">
+            <!-- <el-col :span="12">
               <el-button size="mini" type="primary" @click.native="editFn(scope.row.id)">编辑</el-button>
-            </el-col>
-            <el-col :span="12">
+            </el-col> -->
+            <el-col>
               <el-switch
+                @change="disableStatus(scope.row.id)"
                 style="display: block"
-                v-model="scope.row.freeze"
+                :active-value='av'
+                :inactive-value='iav'
+                v-model="scope.row.status"
                 active-color="#13ce66"
                 inactive-color="#ff4949"
                 active-text="解冻"
@@ -70,86 +75,113 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: 'Mlist',
   data () {
     return {
-      currentPage4: 4,
-      types: ['所有状态', '冻结', '未冻结'],
-      state: '所有状态',
-      MlistForm: {
-        stateValue: '',
-        name: ''
-      },
-      tableData: [{
-        id: 1,
-        date: '2016-05-02',
-        tel: '15057187176',
-        name: '王小虎',
-        img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
-        title: '上海市普陀区金沙江路 1518 弄',
-        bonum: '10',
-        shounum: '11',
-        freeze: true
-      }, {
-        id: 2,
-        date: '2016-05-04',
-        tel: '15057187177',
-        name: '王小虎',
-        img: 'http://img1.3lian.com/2015/a1/63/d/121.jpg',
-        title: '上海市普陀区金沙江路 1517 弄',
-        bonum: '20',
-        shounum: '22',
-        freeze: false
-      }]
+      av: 0,
+      iav: 1, // 冻结
+      loading: true,
+      currentPage: 1, // 当前页
+      pageSize: 10, // 一页有多少条
+      total: 0, // 一共有多少条
+      types: [
+        {value: '', label: '全部'},
+        {value: 0, label: '未冻结'},
+        {value: 1, label: '冻结'}
+      ],
+      status: '', // 冻结状态
+      info: '',
+      tableData: []
+      // tableData: [{
+      //   userName: '111',
+      //   lastLoginTime: '2016-05-02',
+      //   nickName: '王小虎',
+      //   status: 0 // 1冻结，0未冻结
+      // }]
     }
   },
+  computed: {
+    // ...mapGetters(['getMemberList'])
+  },
+  mounted () {
+    this.getList()
+  },
   methods: {
-    // 编辑
-    editFn (id) {
-      this.$router.push({
-        path: `/member/add/${id}`
-      })
+    // disableStatus：冻结/解冻
+    ...mapActions(['disableStatus']),
+    // 转时间格式
+    timeFn (val) {
+      if (val) {
+        return this.$global.formatDate(new Date(val), 'YYYY-MM-DD HH:mm:ss')
+      } else {
+        return ''
+      }
     },
-    // 增加
+    // 获取会员列表
+    getList () {
+      let trans = {
+        currentPage: this.currentPage, // 当前页
+        pageSize: this.pageSize, // 一页有多少条
+        info: this.info, // 用户名
+        status: this.status // 冻结状态
+      }
+      let pam = {}
+      for (let i in trans) {
+        if (trans[i]) {
+          pam[i] = trans[i]
+        }
+      }
+      this.api.userListApi(pam)
+        .then((res) => {
+          if (res.code === 200) {
+            this.total = res.data.total
+            this.tableData = res.data.list
+            setTimeout(() => {
+              this.loading = false
+            }, 800)
+          }
+        })
+    },
+    // 编辑
+    // editFn (id) {
+    //   this.$router.push({
+    //     path: `/member/add/${id}`
+    //   })
+    // },
+    // 增加会员
     addFn () {
-      let id = ' '
-      this.$router.push(`/member/add/${id}`)
+      // let id = ' '
+      // this.$router.push(`/member/add/${id}`)
+      this.$router.push('/member/add')
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.loading = true
+      this.pageSize = val
+      this.getList()
     },
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+      this.loading = true
+      this.currentPage = val
+      this.getList()
     },
-    onSubmit () {
-      console.log(this.MlistForm)
-    },
-    selectChange (val) {
-      console.log(val)
-      switch (val) {
-        case '所有状态':
-          this.MlistForm.stateValue = 0
-          break
-        case '状态一':
-          this.MlistForm.stateValue = 1
-          break
-      }
+    searchFn () {
+      this.loading = true
+      this.currentPage = 1
+      this.getList()
     }
-    // handleEdit (index, row) {
-    //   console.log(index, row)
-    // }
   }
 }
 </script>

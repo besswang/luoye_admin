@@ -23,7 +23,6 @@ const actions = {
   async login ({commit}, params) {
     let res = await api.loginApi(params)
     commit(types.SAVE_USER, res)
-    console.log('这里执行了没')
     /* global vm */
     vm.$message({
       message: '登陆成功',

@@ -30,26 +30,6 @@ import { mapActions } from 'vuex'
 export default {
   name: 'Login',
   data () {
-    var checkUser = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('手机号不能为空'))
-      }
-      setTimeout(() => {
-        let tel = /^[1][3,4,5,7,8][0-9]{9}$/
-        if (!tel.test(value)) {
-          callback(new Error('请输入有效的手机号'))
-        } else {
-          callback()
-        }
-      }, 1000)
-    }
-    var checkPass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
         userName: null,
@@ -57,10 +37,10 @@ export default {
       },
       ruleLogin: {
         userName: [
-          { validator: checkUser, trigger: 'blur' }
+          { validator: this.$global.valiTel, trigger: 'blur' }
         ],
         password: [
-          { validator: checkPass, trigger: 'blur' }
+          { validator: this.$global.valiPass, trigger: 'blur' }
         ]
       }
     }

@@ -2,21 +2,21 @@
   <div id="Wd">
     <el-row>
       <el-col :span="21">
-        <el-form ref="form" :model="MlistForm" :inline="true">
+        <el-form ref="form" :inline="true">
           <el-form-item>
-            <el-input v-model="MlistForm.name" placeholder="输入会员编号"></el-input>
+            <el-input v-model="userName" placeholder="输入会员编号"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="state" @change="selectChange">
-              <el-option v-for="(v,i) in types" :key="i" :value="v"></el-option>
+            <el-select v-model="sourceType">
+              <el-option v-for="(v,i) in types" :key="i" :value="v.value" :label="v.label"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">搜索</el-button>
+            <el-button type="primary" @click.native="onSubmit">搜索</el-button>
           </el-form-item>
-          <el-form-item>
+          <!-- <el-form-item>
             <el-button type="primary" @click="dialogFormVisible = true">开启不限次数观看</el-button>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
       </el-col>
       <el-col :span="3" class="text-r">
@@ -24,6 +24,7 @@
       </el-col>
     </el-row>
     <el-table
+    v-loading="loading"
     :data="tableData"
     style="width: 100%"
     highlight-current-row>
@@ -35,27 +36,31 @@
       </el-table-column>
       <el-table-column
         align="center"
-        property="tel"
+        property="userName"
         label="会员账号">
       </el-table-column>
       <el-table-column
         align="center"
-        property="name"
         label="行为">
+        <template slot-scope="scope">
+          {{sourceTypeFn(scope.row.sourceType)}}
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
-        property="bonum"
-        label="观看次数">
+        label="可用类型">
+        <template slot-scope="scope">
+          {{scope.row.availableType == '1' ? '观看':'下载'}}
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
-        property="bonum"
-        label="下载次数">
+        property="availableNum"
+        label="可用次数">
       </el-table-column>
       <el-table-column
         align="center"
-        property="date"
+        property="createTime"
         label="操作时间">
       </el-table-column>
     </el-table>
@@ -80,11 +85,11 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
   </div>
@@ -95,17 +100,24 @@ export default {
   name: 'Wd',
   data () {
     return {
+      pageSize: 10,
+      currentPage: 1,
+      total: 0,
+      loading: true,
       BanForm: {
         time: ''
       },
       dialogFormVisible: false,
-      currentPage4: 4,
-      types: ['选择类型', '登陆', '注册', '手工发放', '后台发放'],
-      state: '选择类型',
-      MlistForm: {
-        stateValue: '',
-        name: ''
-      },
+      types: [
+        {value: '', label: '选择类型'},
+        {value: '1', label: '注册'},
+        {value: '2', label: '批量发放'},
+        {value: '3', label: '后台添加'},
+        {value: '4', label: '邀请'},
+        {value: '5', label: '被邀请'}
+      ],
+      sourceType: '',
+      userName: '',
       tableData: [{
         id: 1,
         date: '2016-05-02',
@@ -129,7 +141,49 @@ export default {
       }]
     }
   },
+  mounted () {
+    this.getList()
+  },
   methods: {
+    sourceTypeFn (val) {
+      switch (val) {
+        case '1':
+          return '注册'
+        case '2':
+          return '批量发放'
+        case '3':
+          return '后台添加'
+        case '4':
+          return '邀请'
+        case '5':
+          return '被邀请'
+      }
+    },
+    // 列表
+    getList () {
+      let trans = {
+        currentPage: this.currentPage, // 当前页
+        pageSize: this.pageSize, // 一页有多少条
+        sourceType: this.sourceType, // 来源类型
+        userName: this.userName // 会员编号
+      }
+      let pam = {}
+      for (let i in trans) {
+        if (trans[i]) {
+          pam[i] = trans[i]
+        }
+      }
+      this.api.harvestListApi(pam)
+        .then((res) => {
+          if (res.code === 200) {
+            this.total = res.data.total
+            this.tableData = res.data.list
+            setTimeout(() => {
+              this.loading = false
+            }, 800)
+          }
+        })
+    },
     // 手工发放次数
     WdIssue () {
       this.$router.push('/operation/wd/issue')
@@ -146,28 +200,20 @@ export default {
       this.$router.push(`/member/add/${id}`)
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.loading = true
+      this.pageSize = val
+      this.getList()
     },
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+      this.loading = true
+      this.currentPage = val
+      this.getList()
     },
     onSubmit () {
-      console.log(this.MlistForm)
-    },
-    selectChange (val) {
-      console.log(val)
-      switch (val) {
-        case '所有状态':
-          this.MlistForm.stateValue = 0
-          break
-        case '状态一':
-          this.MlistForm.stateValue = 1
-          break
-      }
+      this.loading = true
+      this.currentPage = 1
+      this.getList()
     }
-    // handleEdit (index, row) {
-    //   console.log(index, row)
-    // }
   }
 }
 </script>

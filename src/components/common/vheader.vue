@@ -52,7 +52,6 @@ export default {
 <style scoped>
 .header{
     height: 59px;
-    width: 120px;
     line-height:60px;
     color:#fff;
     cursor: pointer;

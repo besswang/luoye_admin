@@ -1,9 +1,9 @@
 <template>
   <div id="Invite">
-    <el-form ref="form" :model="BanForm" :inline="true">
+    <el-form ref="form" :inline="true">
       <el-form-item>
         <el-date-picker
-          v-model="BanForm.time"
+          v-model="time"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
@@ -11,10 +11,11 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">搜索</el-button>
+        <el-button type="primary" @click.native="searchFn">搜索</el-button>
       </el-form-item>
     </el-form>
     <el-table
+    v-loading="loading"
     :data="tableData"
     style="width: 100%"
     highlight-current-row>
@@ -26,17 +27,19 @@
       </el-table-column>
       <el-table-column
         align="center"
-        property="name"
+        property="sendUser"
         label="受邀注册人">
       </el-table-column>
       <el-table-column
         align="center"
-        property="date"
         label="注册时间">
+        <template slot-scope="scope">
+          {{timeFn(scope.row.createTime)}}
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
-        property="name"
+        property="receiveUser"
         label="邀请人">
       </el-table-column>
     </el-table>
@@ -44,11 +47,11 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
   </div>
@@ -59,51 +62,75 @@ export default {
   name: 'Invite',
   data () {
     return {
-      BanForm: {
-        time: ''
-      },
-      currentPage4: 4,
-      tableData: [{
-        id: 1,
-        date: '2016-05-02',
-        startEnd: '2016-05-02 15:22 - 2016-05-02 15:66',
-        name: '王小虎',
-        img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
-        title: '上海市普陀区金沙江路 1518 弄',
-        bonum: '10',
-        shounum: '11'
-      }, {
-        id: 2,
-        date: '2016-05-04',
-        startEnd: '2016-05-02 15:22 - 2016-05-02 15:66',
-        name: '王小虎',
-        img: 'http://img1.3lian.com/2015/a1/63/d/121.jpg',
-        title: '上海市普陀区金沙江路 1517 弄',
-        bonum: '20',
-        shounum: '22'
-      }]
+      loading: true,
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
+      time: '',
+      startTime: '',
+      endTime: '',
+      tableData: []
+      // tableData: [{
+      //   createTime: '2016-05-02',
+      //   receiveUser: '707558513@qq.com',
+      //   sendUser: '1057120615@qq.com'
+      // }]
     }
   },
+  mounted () {
+    this.inviteList()
+  },
   methods: {
-    // 编辑
-    editFn (id) {
-      this.$router.push({
-        path: `/operation/banadd/${id}`
-      })
+    // 转时间格式
+    timeFn (val) {
+      if (val) {
+        return this.$global.formatDate(new Date(val), 'YYYY-MM-DD HH:mm:ss')
+      } else {
+        return ''
+      }
     },
-    // 增加
-    addFn () {
-      let id = ' '
-      this.$router.push(`/operation/banadd/${id}`)
+    inviteList () {
+      if (this.time) {
+        this.startTime = Date.parse(this.time[0])
+        this.endTime = Date.parse(this.time[1])
+      } else {
+        this.startTime = ''
+        this.endTime = ''
+      }
+      let trans = {
+        currentPage: this.currentPage, // 当前页
+        pageSize: this.pageSize, // 一页有多少条
+        startTime: this.startTime,
+        endTime: this.endTime
+      }
+      let pam = {}
+      for (let i in trans) {
+        if (trans[i]) {
+          pam[i] = trans[i]
+        }
+      }
+      this.api.inviteListApi(pam)
+        .then((res) => {
+          if (res.code === 200) {
+            this.total = res.data.total
+            this.tableData = res.data.list
+            setTimeout(() => {
+              this.loading = false
+            }, 800)
+          }
+        })
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.inviteList()
     },
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+      this.currentPage = val
+      this.inviteList()
     },
-    handleDelete (index, row) {
-      console.log(index, row)
+    searchFn () {
+      this.currentPage = 1
+      this.inviteList()
     }
   }
 }

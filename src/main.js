@@ -10,10 +10,12 @@ import App from './App'
 import router from './router'
 import Fetch from './fetch/index.js'
 import global from './assets/js/global'
+import api from './api/index'
 // 把封装好的文件下载挂载到vue上
 Vue.use(ElementUI)
 Vue.use(Vuex)
 Vue.prototype.$Fetch = Fetch
+Vue.prototype.api = api
 Vue.prototype.$global = global
 Vue.config.productionTip = false
 /* eslint no-undef: "error" */
