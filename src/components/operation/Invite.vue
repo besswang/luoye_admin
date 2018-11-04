@@ -121,14 +121,17 @@ export default {
         })
     },
     handleSizeChange (val) {
+      this.loading = true
       this.pageSize = val
       this.inviteList()
     },
     handleCurrentChange (val) {
+      this.loading = true
       this.currentPage = val
       this.inviteList()
     },
     searchFn () {
+      this.loading = true
       this.currentPage = 1
       this.inviteList()
     }

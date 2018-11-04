@@ -2,10 +2,10 @@
   <div id="bannerlist">
     <el-row>
       <el-col :span="22">
-        <el-form ref="form" :model="BanForm" :inline="true">
+        <el-form ref="form" :inline="true">
           <el-form-item>
             <el-date-picker
-              v-model="BanForm.time"
+              v-model="time"
               type="daterange"
               range-separator="至"
               start-placeholder="开始日期"
@@ -13,7 +13,7 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary">搜索</el-button>
+            <el-button type="primary" @click.native="searchFn">搜索</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -22,6 +22,7 @@
       </el-col>
     </el-row>
     <el-table
+    v-loading="loading"
     :data="tableData"
     style="width: 100%"
     highlight-current-row>
@@ -36,30 +37,51 @@
         label="banner">
         <template slot-scope="scope">
           <div style="width:200px;height:60px;overflow:hidden;margin:0 auto">
-              <img style="display:block;width:100%;" :src="scope.row.img" alt="">
+              <img style="display:block;width:100%;" :src="scope.row.iconUrl" alt="">
           </div>
         </template>
       </el-table-column>
       <el-table-column
         align="center"
-        property="startEnd"
         label="起止时间">
+        <template slot-scope="scope">
+          {{timeFn(scope.row.onLineTime)}} 至 {{timeFn(scope.row.offLineTime)}}
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
-        property="date"
         label="编辑时间">
+        <template slot-scope="scope">
+          {{timeFn(scope.row.updateTime)}}
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="禁用状态">
+        <template slot-scope="scope">
+          <el-switch
+            @change="bannerDisable(scope.row.id)"
+            style="display: block"
+            :active-value='av'
+            :inactive-value='iav'
+            v-model="scope.row.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="正常"
+            inactive-text="禁用">
+          </el-switch>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="primary"
-            @click="editFn(scope.row.id)">编辑</el-button>
+            @click="editFn(scope.row)">编辑</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            @click="deleteFn(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -67,66 +89,125 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: 'BannerList',
   data () {
     return {
-      BanForm: {
-        time: ''
-      },
-      currentPage4: 4,
+      av: 0, // 启用
+      iav: 1, // 禁用
+      time: '',
+      startTime: '',
+      endTime: '',
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
+      loading: true,
       tableData: [{
         id: 1,
-        date: '2016-05-02',
-        startEnd: '2016-05-02 15:22 - 2016-05-02 15:66',
-        name: '王小虎',
-        img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
-        title: '上海市普陀区金沙江路 1518 弄',
-        bonum: '10',
-        shounum: '11'
-      }, {
-        id: 2,
-        date: '2016-05-04',
-        startEnd: '2016-05-02 15:22 - 2016-05-02 15:66',
-        name: '王小虎',
-        img: 'http://img1.3lian.com/2015/a1/63/d/121.jpg',
-        title: '上海市普陀区金沙江路 1517 弄',
-        bonum: '20',
-        shounum: '22'
+        offLineTime: 1605938486000, // 结束时间
+        onLineTime: 1540450878000, // 开始时间
+        upateTime: null // 更新时间
       }]
     }
   },
+  mounted () {
+    this.getList()
+  },
   methods: {
+    ...mapActions(['bannerDisable']),
+    deleteFn (id) {
+      this.loading = true
+      this.api.bannerRemoveApi(id)
+        .then((res) => {
+          if (res.code === 200) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            setTimeout(() => {
+              this.getList()
+            }, 800)
+          }
+        })
+    },
+    // 转时间格式
+    timeFn (val) {
+      if (val) {
+        return this.$global.formatDate(new Date(val), 'YYYY-MM-DD')
+      } else {
+        return ''
+      }
+    },
+    // 列表
+    getList () {
+      if (this.time) {
+        this.startTime = Date.parse(this.time[0])
+        this.endTime = Date.parse(this.time[1])
+      } else {
+        this.startTime = ''
+        this.endTime = ''
+      }
+      let trans = {
+        currentPage: this.currentPage, // 当前页
+        pageSize: this.pageSize, // 一页有多少条
+        onLineTime: this.startTime,
+        offLineTime: this.endTime
+      }
+      let pam = {}
+      for (let i in trans) {
+        if (trans[i]) {
+          pam[i] = trans[i]
+        }
+      }
+      this.api.bannerListApi(pam)
+        .then((res) => {
+          if (res.code === 200) {
+            this.total = res.data.total
+            this.tableData = res.data.list
+            setTimeout(() => {
+              this.loading = false
+            }, 800)
+          }
+        })
+    },
     // 编辑
-    editFn (id) {
+    editFn (row) {
+      console.log(row)
       this.$router.push({
-        path: `/operation/banadd/${id}`
+        path: '/operation/banadd',
+        query: row
       })
     },
     // 增加
     addFn () {
-      let id = ' '
-      this.$router.push(`/operation/banadd/${id}`)
+      this.$router.push('/operation/banadd')
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.loading = true
+      this.pageSize = val
+      this.getList()
     },
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+      this.loading = true
+      this.currentPage = val
+      this.getList()
     },
-    handleDelete (index, row) {
-      console.log(index, row)
+    searchFn () {
+      this.loading = true
+      this.currentPage = 1
+      this.getList()
     }
   }
 }

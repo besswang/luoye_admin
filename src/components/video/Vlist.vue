@@ -6,6 +6,7 @@
       </router-link>
     </div>
     <el-table
+    v-loading="loading"
     :data="tableData"
     style="width: 100%"
     highlight-current-row>
@@ -17,19 +18,14 @@
       </el-table-column>
       <el-table-column
         align="center"
-        property="date"
-        label="日期">
-      </el-table-column>
-      <el-table-column
-        align="center"
         label="封面">
         <template slot-scope="scope">
-          <img style="display:block;width:100px;margin:0 auto;" :src="scope.row.img" alt="">
+          <img style="display:block;width:100px;margin:0 auto;" :src="scope.row.iconUrl" alt="">
         </template>
       </el-table-column>
       <el-table-column
         align="center"
-        property="classify"
+        property="name"
         label="类型">
       </el-table-column>
       <el-table-column
@@ -39,24 +35,58 @@
       </el-table-column>
       <el-table-column
         align="center"
-        property="bonum"
+        property="playTimes"
         label="播放次数">
       </el-table-column>
       <el-table-column
         align="center"
-        property="bonum"
+        property="collectTimes"
         label="收藏次数">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="禁用状态">
+        <template slot-scope="scope">
+          <el-switch
+            @change="videoDisable(scope.row.id)"
+            style="display: block"
+            :active-value='av'
+            :inactive-value='iav'
+            v-model="scope.row.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="正常"
+            inactive-text="禁用">
+          </el-switch>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="160">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="primary"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            @click="handleEdit(scope.row)">编辑</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            @click="handleDelete(scope.row.id)">删除</el-button>
+            <!-- 编辑弹窗 -->
+            <el-dialog title="编辑" :visible.sync="dialogFormVisible" width="30%">
+              <el-form :model="editForm" label-width="80px">
+                <el-form-item label="标题">
+                  <el-input v-model="editForm.title" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="类型">
+                  <el-select v-model="editForm.categoryId">
+                    <el-option v-for="(v,i) in getCategory" :key="i" :value="v.id" :label="v.label"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveTitle(scope.row.id)">确 定</el-button>
+              </div>
+            </el-dialog>
         </template>
       </el-table-column>
     </el-table>
@@ -64,45 +94,33 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
-    <!-- 编辑弹窗 -->
-    <el-dialog title="编辑" :visible.sync="dialogFormVisible" width="30%">
-      <el-form :model="editForm" label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="editForm.title" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="类型">
-          <el-select v-model="state" @change="selectChange">
-            <el-option v-for="(v,i) in types" :key="i" :value="v"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'Vlist',
   data () {
     return {
+      av: 0, // 启用
+      iav: 1, // 禁用
+      loading: true,
       editForm: {
-        title: ''
+        title: '',
+        categoryId: ''
       },
-      types: ['角色一', '角色二'],
-      state: '默认角色',
       dialogFormVisible: false,
-      currentPage4: 4,
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
       tableData: [{
         date: '2016-05-02',
         name: '王小虎',
@@ -122,7 +140,60 @@ export default {
       }]
     }
   },
+  computed: {
+    ...mapGetters(['getCategory'])
+  },
+  mounted () {
+    this.getList()
+  },
   methods: {
+    ...mapActions(['videoDisable', 'videoCategory']),
+    // 编辑保存
+    saveTitle (id) {
+      this.loading = true
+      let trans = {
+        title: this.editForm.title,
+        categoryId: Number(this.editForm.categoryId),
+        videoId: id
+      }
+      this.api.videoEditApi(trans)
+        .then((res) => {
+          if (res.code === 200) {
+            this.dialogFormVisible = false
+            this.$message({
+              message: '保存成功',
+              type: 'success'
+            })
+            setTimeout(() => {
+              this.getList()
+            }, 800)
+          }
+        })
+    },
+    // 列表
+    getList () {
+      let trans = {
+        currentPage: this.currentPage, // 当前页
+        pageSize: this.pageSize // 一页有多少条
+      }
+      let pam = {}
+      for (let i in trans) {
+        if (trans[i]) {
+          pam[i] = trans[i]
+        }
+      }
+      this.api.videoListApi(pam)
+        .then((res) => {
+          if (res.code === 200) {
+            console.log(res)
+            this.total = res.data.total
+            this.tableData = res.data.list
+            setTimeout(() => {
+              this.loading = false
+            }, 800)
+          }
+        })
+    },
     selectChange (val) {
       console.log(val)
       switch (val) {
@@ -135,17 +206,35 @@ export default {
       }
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.loading = true
+      this.pageSize = val
+      this.getList()
     },
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+      this.loading = true
+      this.currentPage = val
+      this.getList()
     },
-    handleEdit (index, row) {
+    handleEdit (row) {
       this.dialogFormVisible = true
-      console.log(index, row)
+      this.editForm.title = row.title
+      console.log(row)
+      this.videoCategory()
     },
-    handleDelete (index, row) {
-      console.log(index, row)
+    handleDelete (id) {
+      this.loading = true
+      this.api.videoRemoveApi(id)
+        .then((res) => {
+          if (res.code === 200) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            setTimeout(() => {
+              this.getList()
+            }, 800)
+          }
+        })
     }
   }
 }

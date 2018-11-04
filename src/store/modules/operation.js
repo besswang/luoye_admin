@@ -30,17 +30,13 @@ const actions = {
       vm.$router.push('/member/list')
     }, 800)
   },
-  // 会员列表
-  async userList ({commit}, params) {
-    await api.userListApi(params)
-    /* global vm */
-    // vm.$message({
-    //   message: '添加成功',
-    //   type: 'success'
-    // })
-    // setTimeout(() => {
-    //   vm.$router.push('/member/list')
-    // }, 800)
+  // 启用/禁用
+  async bannerDisable ({commit}, params) {
+    await api.bannerDisableApi(params)
+    vm.$message({
+      message: '操作成功',
+      type: 'success'
+    })
   }
 }
 export default {

@@ -56,7 +56,7 @@ export default new Router({
           component: components('operation/BannerList')
         },
         {
-          path: '/operation/banadd/:id',
+          path: '/operation/banadd',
           name: 'BanAdd',
           component: components('operation/BanAdd')
         },
