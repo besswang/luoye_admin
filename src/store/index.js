@@ -20,7 +20,7 @@ const index = new Vuex.Store({
   modules: {
     user,
     member,
-    operation
+    operation: operation
   }
 })
 export default index

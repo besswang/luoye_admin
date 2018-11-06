@@ -41,11 +41,14 @@
               <el-menu-item index="/operation/wd">观看和下载</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
+              <el-menu-item index="/operation/advertising">广告管理</el-menu-item>
+            </el-menu-item-group>
+            <!-- <el-menu-item-group>
               <el-menu-item index="/operation/domain">域名管理</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group>
               <el-menu-item index="/operation/basic">基础定义</el-menu-item>
-            </el-menu-item-group>
+            </el-menu-item-group> -->
           </el-submenu>
         </el-menu>
       </el-col>

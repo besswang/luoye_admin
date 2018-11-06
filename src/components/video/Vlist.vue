@@ -45,6 +45,23 @@
       </el-table-column>
       <el-table-column
         align="center"
+        label="是否推荐">
+        <template slot-scope="scope">
+          <el-switch
+            @change="videoSpread(scope.row.id)"
+            style="display: block"
+            :active-value='spreadAv'
+            :inactive-value='spreadIav'
+            v-model="scope.row.spread"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="是"
+            inactive-text="否">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
         label="禁用状态">
         <template slot-scope="scope">
           <el-switch
@@ -84,7 +101,7 @@
               </el-form>
               <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveTitle(scope.row.id)">确 定</el-button>
+                <el-button type="primary" @click="saveTitle()">确 定</el-button>
               </div>
             </el-dialog>
         </template>
@@ -110,6 +127,9 @@ export default {
   name: 'Vlist',
   data () {
     return {
+      videoId: '',
+      spreadAv: 1,
+      spreadIav: 0,
       av: 0, // 启用
       iav: 1, // 禁用
       loading: true,
@@ -121,23 +141,16 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
-        classify: '动漫',
-        title: '上海市普陀区金沙江路 1518 弄',
-        bonum: '10',
-        shounum: '11'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        img: 'http://img1.3lian.com/2015/a1/63/d/121.jpg',
-        classify: '美食',
-        title: '上海市普陀区金沙江路 1517 弄',
-        bonum: '20',
-        shounum: '22'
-      }]
+      tableData: []
+      // tableData: [{
+      //   date: '2016-05-02',
+      //   name: '王小虎',
+      //   img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
+      //   classify: '动漫',
+      //   title: '上海市普陀区金沙江路 1518 弄',
+      //   bonum: '10',
+      //   shounum: '11'
+      // }]
     }
   },
   computed: {
@@ -147,16 +160,22 @@ export default {
     this.getList()
   },
   methods: {
-    ...mapActions(['videoDisable', 'videoCategory']),
+    ...mapActions(['videoDisable', 'videoCategory', 'videoSpread']),
     // 编辑保存
-    saveTitle (id) {
+    saveTitle () {
       this.loading = true
       let trans = {
         title: this.editForm.title,
         categoryId: Number(this.editForm.categoryId),
-        videoId: id
+        videoId: this.videoId
       }
-      this.api.videoEditApi(trans)
+      let pam = {}
+      for (let i in trans) {
+        if (trans[i]) {
+          pam[i] = trans[i]
+        }
+      }
+      this.api.videoEditApi(pam)
         .then((res) => {
           if (res.code === 200) {
             this.dialogFormVisible = false
@@ -185,7 +204,6 @@ export default {
       this.api.videoListApi(pam)
         .then((res) => {
           if (res.code === 200) {
-            console.log(res)
             this.total = res.data.total
             this.tableData = res.data.list
             setTimeout(() => {
@@ -195,7 +213,6 @@ export default {
         })
     },
     selectChange (val) {
-      console.log(val)
       switch (val) {
         case '角色一':
           // this.addForm.userType = 0
@@ -218,8 +235,9 @@ export default {
     handleEdit (row) {
       this.dialogFormVisible = true
       this.editForm.title = row.title
-      console.log(row)
-      this.videoCategory()
+      this.editForm.categoryId = row.name
+      this.videoId = row.id
+      this.videoCategory(row)
     },
     handleDelete (id) {
       this.loading = true

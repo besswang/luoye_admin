@@ -2,25 +2,30 @@
 import * as types from '../mutation-types'
 import api from '../../api'
 // 会员列表
-const memberList = {}
+const memberList = {
+  total: '',
+  list: []
+}
 const category = [] // 视频分类
+const categoryId = ''
 const state = {
   memberList,
-  category
+  category,
+  categoryId
 }
 const getters = {
   getMemberList: state => state.memberList,
-  getCategory: state => state.category
+  getCategory: state => state.category,
+  getCategoryId: state => state.categoryId
 }
 const mutations = {
   // 登陆后存储用户信息
   [types.SAVE_MEMBER_LIST] (state, data) {
-    state.memberList = data.data
+    state.memberList.total = data.data.total
+    state.memberList.list.push(data.data.list)
   },
   // 视频分类
   [types.SAVE_CATEGORY] (state, data) {
-    console.log('guo')
-    console.log(data)
     let arr = []
     for (var i in data) {
       let c = {
@@ -30,6 +35,17 @@ const mutations = {
       arr.push(c)
     }
     state.category = [...arr]
+  },
+  [types.SAVE_CURRENT_CATEGORY] (state, data) {
+    if (data.name !== null) {
+      let obj = state.category.filter(val => {
+        return val.label === data.name
+      })
+      console.log(obj)
+      state.categoryId = obj[0].id
+    } else {
+      state.categoryId = ''
+    }
   }
 }
 const actions = {
@@ -68,8 +84,17 @@ const actions = {
   },
   // 视频-分类
   async videoCategory ({commit}, params) {
-    let res = await api.videoCategoryApi(params)
+    let res = await api.videoCategoryApi()
     commit(types.SAVE_CATEGORY, res.data)
+    commit(types.SAVE_CURRENT_CATEGORY, params)
+  },
+  // 视频-是否推荐
+  async videoSpread ({commit}, params) {
+    await api.videoSpreadApi(params)
+    vm.$message({
+      message: '操作成功',
+      type: 'success'
+    })
   }
 }
 export default {

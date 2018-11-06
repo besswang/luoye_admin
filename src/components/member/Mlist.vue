@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'Mlist',
   data () {
@@ -114,14 +114,15 @@ export default {
     }
   },
   computed: {
-    // ...mapGetters(['getMemberList'])
+    ...mapGetters(['getMemberList'])
   },
   mounted () {
     this.getList()
+    console.log(this.getMemberList)
   },
   methods: {
     // disableStatus：冻结/解冻
-    ...mapActions(['disableStatus']),
+    ...mapActions(['disableStatus', 'userList']),
     // 转时间格式
     timeFn (val) {
       if (val) {
@@ -144,6 +145,7 @@ export default {
           pam[i] = trans[i]
         }
       }
+      // this.userList(pam)
       this.api.userListApi(pam)
         .then((res) => {
           if (res.code === 200) {

@@ -18,5 +18,15 @@ export default {
   'videoDisable': 'video/disable/', // 视频-禁用启用
   'videoEdit': 'video/edit', // 视频-编辑
   'videoCategory': 'video/category', // 视频分类
-  'videoRemove': 'video/remove/' // 视频-删除
+  'videoRemove': 'video/remove/', // 视频-删除
+  'videoSpread': 'video/spread/', // 视频-是否推荐
+  'categoryList': 'category/list', // 分类管理-分类列表
+  'categoryAdd': 'category/add', // 分类管理-新增分类
+  'categoryDisable': 'category/disable/', // 是否禁用
+  'categorySpread': 'category/spread/', // 是否推荐
+  'parentCategory': 'category/parentCategory/', // 父级分类
+  'categoryEdit': 'category/edit', // 分类管理-编辑
+  'advertList': 'advert/list', // 广告管理-列表
+  'advertDisable': 'advert/disable/', // 广告管理-是否禁用
+  'advertAdd': 'advert/add' // 添加
 }

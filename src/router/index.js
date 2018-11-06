@@ -89,6 +89,16 @@ export default new Router({
           path: '/operation/basic', // 基础定义
           name: 'Basic',
           component: components('operation/Basic')
+        },
+        {
+          path: '/operation/advertising', // 广告管理
+          name: 'Advertising',
+          component: components('operation/Advertising')
+        },
+        {
+          path: '/operation/advertadd', // 广告管理-添加
+          name: 'AdvertAdd',
+          component: components('operation/AdvertAdd')
         }
       ]
     }

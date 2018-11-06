@@ -38,5 +38,25 @@ export default {
   // 视频-分类
   videoCategoryApi: () => Fetch(jk.videoCategory, {method: 'get'}),
   // 视频-删除
-  videoRemoveApi: params => Fetch(`${jk.videoRemove}${params}`, {method: 'get'})
+  videoRemoveApi: params => Fetch(`${jk.videoRemove}${params}`, {method: 'get'}),
+  // 视频-是否推荐
+  videoSpreadApi: params => Fetch(`${jk.videoSpread}${params}`, {method: 'get'}),
+  // 分类管理-分类列表
+  categoryListApi: params => Fetch(jk.categoryList, {method: 'post', body: params}),
+  // 分类管理-新增分类
+  categoryAddApi: params => Fetch(jk.categoryAdd, {method: 'post', body: params}),
+  // 是否禁用
+  categoryDisableApi: params => Fetch(`${jk.categoryDisable}${params}`, {method: 'get'}),
+  // 是否推荐
+  categorySpreadApi: params => Fetch(`${jk.categorySpread}${params}`, {method: 'get'}),
+  // 父级分类
+  parentCategoryApi: params => Fetch(`${jk.parentCategory}${params}`, {method: 'get'}),
+  // 分类管理-编辑
+  categoryEditApi: params => Fetch(jk.categoryEdit, {method: 'post', body: params}),
+  // 广告管理-列表
+  advertListApi: params => Fetch(jk.advertList, {method: 'post', body: params}),
+  // 广告管理-是否禁用
+  advertDisableApi: params => Fetch(`${jk.advertDisable}${params}`, {method: 'get'}),
+  // 广告管理-添加
+  advertAddApi: params => Fetch(jk.advertAdd, {method: 'post', body: params})
 }

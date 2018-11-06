@@ -110,7 +110,11 @@ export default {
         return false
       })
       // 当某个文件的分块在发送前触发
-      this.uploader.on('uploadBeforeSend', (block, data) => {
+      this.uploader.on('uploadBeforeSend', (block, data, headers) => {
+        let token = window.sessionStorage.getItem('token')
+        $.extend(headers, {
+          'token': token
+        })
         // 拼装md5
         let md5 = `${this.guid}${data.chunk}`
         // console.log(md5)
