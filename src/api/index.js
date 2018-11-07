@@ -58,5 +58,9 @@ export default {
   // 广告管理-是否禁用
   advertDisableApi: params => Fetch(`${jk.advertDisable}${params}`, {method: 'get'}),
   // 广告管理-添加
-  advertAddApi: params => Fetch(jk.advertAdd, {method: 'post', body: params})
+  advertAddApi: params => Fetch(jk.advertAdd, {method: 'post', body: params}),
+  // 编辑
+  advertEditApi: params => Fetch(jk.advertEdit, {method: 'post', body: params}),
+  // 删除
+  advertRemoveApi: params => Fetch(`${jk.advertRemove}${params}`, {method: 'get'})
 }

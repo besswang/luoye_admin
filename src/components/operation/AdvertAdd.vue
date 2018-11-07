@@ -3,7 +3,7 @@
     <div class="ptb15 mb15">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/operation/advertising' }">广告管理</el-breadcrumb-item>
-          <el-breadcrumb-item>添加</el-breadcrumb-item>
+          <el-breadcrumb-item>{{breadcrumbText}}</el-breadcrumb-item>
         </el-breadcrumb>
     </div>
     <el-form ref="BanForm" :model="BanForm" :rules="ruleBanform" label-width="80px" style="width:50%;">
@@ -15,9 +15,9 @@
       <el-form-item label="标题" prop="title">
         <el-input v-model="BanForm.title"></el-input>
       </el-form-item>
-      <el-form-item label="执行时间">
+      <el-form-item label="执行时间" v-if="editTime">
         <el-date-picker
-          v-model="time"
+          v-model="BanForm.time"
           type="datetimerange"
           start-placeholder="开始日期"
           end-placeholder="结束日期">
@@ -37,6 +37,7 @@
               :before-upload="beforeAvatarUpload">
               <!-- <img v-if="httpUrl" :src="httpUrl" class="avatar"> -->
               <img v-if="BanForm.httpUrl" :src="BanForm.httpUrl" class="avatar">
+              <!-- <img v-if="BanForm.iconUrl" :src="BanForm.iconUrl" class="avatar"> -->
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <p style="color:#868686;font-size:10px;margin-top:-10px;line-height:14px;">建议尺寸：750（宽）*1120（高）</p>
@@ -61,7 +62,8 @@
         <el-input v-model="BanForm.link" placeholder="可以输入任意URL地址，例如：www.hao123.com"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click.native="harvestGrant('BanForm')">保存</el-button>
+        <!-- <el-button type="primary" @click.native="harvestGrant('BanForm')">保存</el-button> -->
+        <el-button type="primary" @click.native="saveAdvert()">保存</el-button>
         <el-button @click.native="cancel">取消</el-button>
       </el-form-item>
     </el-form>
@@ -69,33 +71,19 @@
 </template>
 
 <script>
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 export default {
   name: 'WdIssue',
   data () {
     var token = window.sessionStorage.getItem('token')
     return {
+      editTime: true, // 编辑的时候,执行时间不显示
       myHeaders: {token: token},
-      restaurants: [
-        {'value': '三全鲜食（北新泾店)'},
-        {'value': 'Hot honey 首尔炸鸡（仙霞路)'},
-        {'value': '新旺角茶餐厅'}],
-      searchText: '',
       breadcrumbText: '', // 当前面包屑的文本('编辑'，'增加')
       types: [
-        {name: '1', label: '启动屏广告'},
-        {name: '2', label: '首页弹屏'}
+        {name: 1, label: '启动屏广告'},
+        {name: 2, label: '首页弹屏'}
       ],
-      time: [],
-      BanForm: {
-        type: '1',
-        title: '',
-        startTime: '',
-        endTime: '',
-        iconUrl: '',
-        httpUrl: '',
-        content: '',
-        link: ''
-      },
       ruleBanform: {
         title: [
           { required: true, message: '请输入标题', trigger: 'blur' }
@@ -105,14 +93,26 @@ export default {
     }
   },
   mounted () {
-    let id = this.$route.params.id
-    if (id !== ' ') {
+    // console.log(this.BanForm)
+    if (this.BanForm.id) {
+      this.types = this.types.filter(value => {
+        return value.name === this.BanForm.type
+      })
+      this.editTime = false
       this.breadcrumbText = '编辑'
     } else {
+      this.editTime = true
       this.breadcrumbText = '增加'
     }
   },
+  computed: {
+    ...mapGetters({
+      BanForm: 'getEditAdver'
+    })
+  },
   methods: {
+    ...mapMutations(['']),
+    ...mapActions(['saveAdvert', 'handleAvatarSuccess']),
     reset (formName) {
       this.$refs[formName].resetFields()
     },
@@ -161,12 +161,6 @@ export default {
     handleSelect (item) {
       console.log(item)
     },
-    querySearch (queryString, cb) {
-      var restaurants = this.restaurants
-      var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants
-      // 调用 callback 返回建议列表的数据
-      cb(results)
-    },
     createFilter (queryString) {
       return (restaurant) => {
         return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
@@ -175,18 +169,6 @@ export default {
     // 所属平台
     radioFn (val) {
       console.log(val)
-    },
-    handleAvatarSuccess (res, file) {
-      // this.imageUrl = URL.createObjectURL(file.raw)
-      if (res.code === 200) {
-        this.BanForm.iconUrl = res.data.iconUrl
-        this.BanForm.httpUrl = res.data.viewUrl
-      } else {
-        this.$message({
-          message: res.msg,
-          type: 'warning'
-        })
-      }
     },
     beforeAvatarUpload (file) {
       const isLt2M = parseInt(file.size) / 1024 / 1024 < 5

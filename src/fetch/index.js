@@ -2,7 +2,8 @@ import 'whatwg-fetch'
 // 处理promise和fetch的兼容性以及引入
 require('es6-promise').polyfill()
 // 前置拼接url,process.env.luoHost取的是config--dev.env.js--tbtHost
-const luoHost = process.env.luoHost && process.env.luoHost.url
+// const luoHost = process.env.luoHost && process.env.luoHost.url
+const luoHost = '/luoye_admin/'
 // 自定义headers
 const headers = {
   'Accept': 'application/json; version=3.13.0'

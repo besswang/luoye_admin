@@ -18,7 +18,7 @@
           <img v-if="BanForm.iconUrl " :src="BanForm.iconUrl " class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
-        <span style="color:#868686;font-size:10px;margin-top:-10px;line-height:20px;">建议尺寸：</span>
+        <p style="color:#868686;font-size:10px;margin-top:-10px;line-height:14px;">建议尺寸：375（宽）*174（高）</p>
       </el-form-item>
       <i style="color: #f56c6c;position:absolute;z-index:10;padding-top:12px;padding-left:2px;">*</i>
       <el-form-item label="起止时间">

@@ -20,7 +20,7 @@
         </el-form>
       </el-col>
       <el-col :span="3" class="text-r">
-        <el-button type="primary" @click="WdIssue">添加</el-button>
+        <el-button type="primary" @click="addAdverFn">添加</el-button>
       </el-col>
     </el-row>
     <el-table
@@ -75,11 +75,11 @@
           <el-button
             size="mini"
             type="primary"
-            @click="editFn(scope.row)">编辑</el-button>
+            @click="editAdverFn(scope.row)">编辑</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="deleteFn(scope.row.id)">删除</el-button>
+            @click="advertRemoveFn(scope.$index, item.list, scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -152,11 +152,20 @@ export default {
       item: state => state.operation.adverList
     }),
     ...mapGetters({
-      ruleForm: 'getSearchAdverForm'
+      ruleForm: 'getSearchAdverForm',
+      editForm: 'getEditAdver'
     })
   },
   methods: {
-    ...mapActions(['advertDisable', 'advertList']),
+    ...mapActions(['advertDisable', 'advertList', 'editAdverFn', 'addAdverFn', 'advertRemove']),
+    advertRemoveFn (index, rows, id) {
+      let obj = {
+        index: index,
+        rows: rows,
+        id: id
+      }
+      this.advertRemove(obj)
+    },
     // 转时间格式
     timeFn (val) {
       if (val) {
@@ -191,15 +200,15 @@ export default {
         })
     },
     // 手工发放次数
-    WdIssue () {
-      this.$router.push('/operation/advertadd')
-    },
+    // WdIssue () {
+    //   this.$router.push('/operation/advertadd')
+    // },
     // 编辑
-    editFn (id) {
-      this.$router.push({
-        path: `/member/add/${id}`
-      })
-    },
+    // editFn (id) {
+    //   this.$router.push({
+    //     path: `/member/add/${id}`
+    //   })
+    // },
     // 增加
     addFn () {
       let id = ' '

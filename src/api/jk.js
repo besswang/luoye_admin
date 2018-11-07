@@ -28,5 +28,7 @@ export default {
   'categoryEdit': 'category/edit', // 分类管理-编辑
   'advertList': 'advert/list', // 广告管理-列表
   'advertDisable': 'advert/disable/', // 广告管理-是否禁用
-  'advertAdd': 'advert/add' // 添加
+  'advertAdd': 'advert/add', // 添加
+  'advertEdit': 'advert/edit', // 编辑
+  'advertRemove': 'advert/remove/' // 删除
 }

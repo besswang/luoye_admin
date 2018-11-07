@@ -121,6 +121,12 @@ export default {
         data = $.extend(data, {
           'MD5Key': md5
         })
+        if (data.size < 4194304) {
+          data = $.extend(data, {
+            'chunk': 0,
+            'chunks': 1
+          })
+        }
         // this.uploader.options.formData.MD5Key = this.keyGenerator(md5)
         // if (md5) {
         //   this.uploader.options.formData.MD5Key = md5
