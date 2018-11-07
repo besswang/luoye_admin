@@ -35,9 +35,7 @@
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload">
-              <!-- <img v-if="httpUrl" :src="httpUrl" class="avatar"> -->
               <img v-if="BanForm.httpUrl" :src="BanForm.httpUrl" class="avatar">
-              <!-- <img v-if="BanForm.iconUrl" :src="BanForm.iconUrl" class="avatar"> -->
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <p style="color:#868686;font-size:10px;margin-top:-10px;line-height:14px;">建议尺寸：750（宽）*1120（高）</p>
@@ -62,7 +60,6 @@
         <el-input v-model="BanForm.link" placeholder="可以输入任意URL地址，例如：www.hao123.com"></el-input>
       </el-form-item>
       <el-form-item>
-        <!-- <el-button type="primary" @click.native="harvestGrant('BanForm')">保存</el-button> -->
         <el-button type="primary" @click.native="saveAdvert()">保存</el-button>
         <el-button @click.native="cancel">取消</el-button>
       </el-form-item>
@@ -72,6 +69,7 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { ADVER_TYPE_RADIO } from '../meta/meta.js'
 export default {
   name: 'WdIssue',
   data () {
@@ -80,10 +78,7 @@ export default {
       editTime: true, // 编辑的时候,执行时间不显示
       myHeaders: {token: token},
       breadcrumbText: '', // 当前面包屑的文本('编辑'，'增加')
-      types: [
-        {name: 1, label: '启动屏广告'},
-        {name: 2, label: '首页弹屏'}
-      ],
+      types: ADVER_TYPE_RADIO,
       ruleBanform: {
         title: [
           { required: true, message: '请输入标题', trigger: 'blur' }
@@ -93,7 +88,6 @@ export default {
     }
   },
   mounted () {
-    // console.log(this.BanForm)
     if (this.BanForm.id) {
       this.types = this.types.filter(value => {
         return value.name === this.BanForm.type
@@ -118,45 +112,6 @@ export default {
     },
     cancel () {
       this.$router.go(-1)
-    },
-    harvestGrant (formName) {
-      console.log(this.BanForm)
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          if (this.time.length === 0) {
-            this.$message({
-              message: '请选择日期',
-              type: 'success'
-            })
-            return false
-          }
-          this.BanForm.startTime = Date.parse(this.time[0])
-          this.BanForm.endTime = Date.parse(this.time[1])
-          console.log('zou')
-          let pam = {}
-          for (let i in this.BanForm) {
-            if (this.BanForm[i]) {
-              pam[i] = this.BanForm[i]
-            }
-          }
-          this.api.advertAddApi(pam)
-            .then((res) => {
-              if (res.code === 200) {
-                console.log(res)
-                this.$message({
-                  message: '添加成功',
-                  type: 'success'
-                })
-                setTimeout(() => {
-                  this.$router.push('/operation/advertising')
-                }, 800)
-              }
-            })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
     },
     handleSelect (item) {
       console.log(item)

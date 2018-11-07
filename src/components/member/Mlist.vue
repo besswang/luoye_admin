@@ -87,6 +87,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { MEMBER_TYPE } from '../meta/meta.js'
 export default {
   name: 'Mlist',
   data () {
@@ -97,11 +98,7 @@ export default {
       currentPage: 1, // 当前页
       pageSize: 10, // 一页有多少条
       total: 0, // 一共有多少条
-      types: [
-        {value: '', label: '全部'},
-        {value: 0, label: '未冻结'},
-        {value: 1, label: '冻结'}
-      ],
+      types: MEMBER_TYPE,
       status: '', // 冻结状态
       info: '',
       tableData: []

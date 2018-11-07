@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import { AVAILABLE_TYPE } from '../meta/meta.js'
 export default {
   name: 'WdIssue',
   data () {
@@ -84,10 +85,7 @@ export default {
         {'value': '新旺角茶餐厅'}],
       searchText: '',
       breadcrumbText: '', // 当前面包屑的文本('编辑'，'增加')
-      types: [
-        {value: 1, label: '观看'},
-        {value: 2, label: '下载'}
-      ],
+      types: AVAILABLE_TYPE,
       BanForm: {
         grantType: 1, // 发放类型
         toUsers: '', // 指定成员编号

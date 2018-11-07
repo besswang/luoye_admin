@@ -1,5 +1,6 @@
 <template>
   <div id="Wd">
+    <!-- 运营-观看和下载 -->
     <el-row>
       <el-col :span="21">
         <el-form ref="form" :inline="true">
@@ -96,6 +97,7 @@
 </template>
 
 <script>
+import { SOURCE_TYPE } from '../meta/meta.js'
 export default {
   name: 'Wd',
   data () {
@@ -108,14 +110,7 @@ export default {
         time: ''
       },
       dialogFormVisible: false,
-      types: [
-        {value: '', label: '选择类型'},
-        {value: '1', label: '注册'},
-        {value: '2', label: '批量发放'},
-        {value: '3', label: '后台添加'},
-        {value: '4', label: '邀请'},
-        {value: '5', label: '被邀请'}
-      ],
+      types: SOURCE_TYPE,
       sourceType: '',
       userName: '',
       tableData: [{

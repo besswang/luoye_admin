@@ -116,6 +116,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { ADVER_TYPE_SELECT } from '../meta/meta.js'
 export default {
   name: 'Wd',
   data () {
@@ -131,11 +132,7 @@ export default {
         time: ''
       },
       dialogFormVisible: false,
-      types: [
-        {value: '', label: '选择类型'},
-        {value: '1', label: '启动屏广告'},
-        {value: '2', label: '首页弹屏'}
-      ],
+      types: ADVER_TYPE_SELECT,
       type: '',
       tableData: []
     }
@@ -199,16 +196,6 @@ export default {
           }
         })
     },
-    // 手工发放次数
-    // WdIssue () {
-    //   this.$router.push('/operation/advertadd')
-    // },
-    // 编辑
-    // editFn (id) {
-    //   this.$router.push({
-    //     path: `/member/add/${id}`
-    //   })
-    // },
     // 增加
     addFn () {
       let id = ' '

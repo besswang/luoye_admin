@@ -139,7 +139,6 @@ export default {
       spreadIav: 0,
       av: 0, // 启用
       iav: 1, // 禁用
-      types: ['娱乐', '社会'],
       dialogFormVisible: false, // 弹窗
       showClassOne: false, // 是否显示父级分类
       dialogForm: {

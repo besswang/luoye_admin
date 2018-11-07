@@ -51,16 +51,14 @@
 </template>
 
 <script>
+import { BANNER_TYPE } from '../meta/meta.js'
 export default {
   name: 'BanAdd',
   data () {
     var token = window.sessionStorage.getItem('token')
     return {
       breadcrumbText: '', // 当前面包屑的文本('编辑'，'增加')
-      types: [
-        {value: 1, label: '外链'},
-        {value: 2, label: '内部资源'}
-      ],
+      types: BANNER_TYPE,
       myHeaders: {token: token},
       type: 1,
       BanForm: {
