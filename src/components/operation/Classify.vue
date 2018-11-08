@@ -110,7 +110,7 @@
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="dialogForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="父级分类" v-show="showClassOne">
+        <el-form-item label="父级分类" v-show="showClassOneSelect">
           <el-select v-model="dialogForm.parentId" placeholder="请选择父级分类">
             <el-option v-for="(v,i) in getParentCategory" :key="i" :value="v.id" :label="v.label"></el-option>
           </el-select>
@@ -141,6 +141,7 @@ export default {
       iav: 1, // 禁用
       dialogFormVisible: false, // 弹窗
       showClassOne: false, // 是否显示父级分类
+      showClassOneSelect: false,
       dialogForm: {
         iconUrl: '',
         name: '', // 分类名称
@@ -238,9 +239,7 @@ export default {
       // this.dialogForm.iconUrl = item.iconUrl
       this.dialogFormVisible = true
       this.categoryId = item.id
-      if (this.grade === '2') {
-        this.showClassOne = false
-      }
+      this.showClassOneSelect = false
     },
     // 添加分类
     addFn () {
@@ -256,8 +255,10 @@ export default {
       console.log(this.grade)
       this.categoryId = ''
       if (this.grade === '2') {
-        this.parentCategory(this.grade)
-        this.showClassOne = true
+        this.parentCategory(1)
+        this.showClassOneSelect = true
+      } else {
+        this.showClassOneSelect = false
       }
     },
     // 添加-保存

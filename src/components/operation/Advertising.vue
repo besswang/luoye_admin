@@ -14,9 +14,6 @@
           <el-form-item>
             <el-button type="primary" @click.native="onSubmit">搜索</el-button>
           </el-form-item>
-          <!-- <el-form-item>
-            <el-button type="primary" @click="dialogFormVisible = true">开启不限次数观看</el-button>
-          </el-form-item> -->
         </el-form>
       </el-col>
       <el-col :span="3" class="text-r">
@@ -83,23 +80,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title='开启不限次数观看' :visible.sync="dialogFormVisible">
-      <el-form ref="form" :model="BanForm" :inline="true">
-        <el-form-item>
-          <el-date-picker
-            v-model="BanForm.time"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
     <div class="text-r ptb15">
       <el-pagination
         @size-change="handleSizeChange"
@@ -121,27 +101,13 @@ export default {
   name: 'Wd',
   data () {
     return {
-      title: '',
       av: 0, // 启用
       iav: 1, // 禁用
-      pageSize: 10,
-      currentPage: 1,
-      total: 0,
       loading: false,
-      BanForm: {
-        time: ''
-      },
-      dialogFormVisible: false,
-      types: ADVER_TYPE_SELECT,
-      type: '',
-      tableData: []
+      types: ADVER_TYPE_SELECT
     }
   },
-  created () {
-
-  },
   mounted () {
-    // this.getList()
     this.advertList(this.ruleForm)
   },
   computed: {
@@ -171,50 +137,15 @@ export default {
         return ''
       }
     },
-    // 列表
-    getList () {
-      let trans = {
-        currentPage: this.currentPage, // 当前页
-        pageSize: this.pageSize, // 一页有多少条
-        title: this.title,
-        type: this.type
-      }
-      let pam = {}
-      for (let i in trans) {
-        if (trans[i]) {
-          pam[i] = trans[i]
-        }
-      }
-      this.api.advertListApi(pam)
-        .then((res) => {
-          if (res.code === 200) {
-            this.total = res.data.total
-            this.tableData = res.data.list
-            setTimeout(() => {
-              this.loading = false
-            }, 800)
-          }
-        })
-    },
-    // 增加
-    addFn () {
-      let id = ' '
-      this.$router.push(`/member/add/${id}`)
-    },
     handleSizeChange (val) {
-      this.loading = true
-      this.pageSize = val
-      this.getList()
+      this.ruleForm.pageSize = val
+      this.advertList(this.ruleForm)
     },
     handleCurrentChange (val) {
-      this.loading = true
-      this.currentPage = val
-      this.getList()
+      this.ruleForm.currentPage = val
+      this.advertList(this.ruleForm)
     },
     onSubmit () {
-      // this.loading = true
-      // this.currentPage = 1
-      // this.getList()
       this.ruleForm.currentPage = 1
       this.advertList(this.ruleForm)
     }

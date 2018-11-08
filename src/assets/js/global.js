@@ -21,6 +21,17 @@ export default {
       callback()
     }
   },
+  // 次数(大于0的正整数)
+  valiNum: (rule, value, callback) => {
+    let reg = /^([1-9][0-9]*)$/
+    if (!value) {
+      callback(new Error('奖励次数不能为空'))
+    } else if (!reg.test(value)) {
+      callback(new Error('奖励次数必须大于0的整数'))
+    } else {
+      callback()
+    }
+  },
   // 时间戳格式化
   formatDate: (date, fmt) => {
     if (/(y+)/.test(fmt) || /(Y+)/.test(fmt)) {

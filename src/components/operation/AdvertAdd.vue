@@ -6,16 +6,16 @@
           <el-breadcrumb-item>{{breadcrumbText}}</el-breadcrumb-item>
         </el-breadcrumb>
     </div>
-    <el-form ref="BanForm" :model="BanForm" :rules="ruleBanform" label-width="80px" style="width:50%;">
+    <el-form ref="BanForm" :model="BanForm" :rules="rules" label-width="80px" style="width:50%;">
       <el-form-item label="添加类型">
-        <el-radio-group v-model="BanForm.type" @change="reset('BanForm')">
+        <el-radio-group v-model="BanForm.type">
           <el-radio v-for="(v,i) in types" :key="i" :label="v.name">{{v.label}}</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="标题" prop="title">
         <el-input v-model="BanForm.title"></el-input>
       </el-form-item>
-      <el-form-item label="执行时间" v-if="editTime">
+      <el-form-item label="执行时间" prop="time">
         <el-date-picker
           v-model="BanForm.time"
           type="datetimerange"
@@ -23,11 +23,10 @@
           end-placeholder="结束日期">
         </el-date-picker>
       </el-form-item>
+      <i style="color: #f56c6c;position:absolute;z-index:10;padding-top:12px;padding-left:2px;">*</i>
       <transition name="fade" v-if="BanForm.type == 1">
         <div>
-          <el-form-item label="广告素材"
-            prop="httpUrl"
-            :rules="[{ required: true, message: '请上传素材图片', trigger: 'blur' }]">
+          <el-form-item label="广告素材">
             <el-upload
               :headers="myHeaders"
               class="avatar-uploader"
@@ -46,7 +45,7 @@
         <div>
           <el-form-item label="弹屏内容"
             prop="content"
-            :rules="[{ required: true, message: '请填写内容', trigger: 'blur' }]">
+            :rules="[{ required: true }]">
             <el-input
               type="textarea"
               :autosize="{ minRows: 3, maxRows: 6}"
@@ -60,7 +59,7 @@
         <el-input v-model="BanForm.link" placeholder="可以输入任意URL地址，例如：www.hao123.com"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click.native="saveAdvert()">保存</el-button>
+        <el-button type="primary" @click.native="validateFn('BanForm')">保存</el-button>
         <el-button @click.native="cancel">取消</el-button>
       </el-form-item>
     </el-form>
@@ -68,20 +67,24 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { ADVER_TYPE_RADIO } from '../meta/meta.js'
 export default {
   name: 'WdIssue',
   data () {
     var token = window.sessionStorage.getItem('token')
     return {
-      editTime: true, // 编辑的时候,执行时间不显示
+      // editTime: true, // 编辑的时候,执行时间不显示
       myHeaders: {token: token},
       breadcrumbText: '', // 当前面包屑的文本('编辑'，'增加')
       types: ADVER_TYPE_RADIO,
-      ruleBanform: {
+      rules: {
         title: [
           { required: true, message: '请输入标题', trigger: 'blur' }
+          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        time: [
+          { required: true, message: '请选择时间', trigger: 'blur' }
           // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ]
       }
@@ -92,21 +95,49 @@ export default {
       this.types = this.types.filter(value => {
         return value.name === this.BanForm.type
       })
-      this.editTime = false
+      // this.editTime = false
       this.breadcrumbText = '编辑'
     } else {
-      this.editTime = true
+      // this.editTime = true
       this.breadcrumbText = '增加'
     }
   },
   computed: {
+    // ...mapState({
+    //   rules: state => state.operation.edit_adver_rules
+    // }),
     ...mapGetters({
       BanForm: 'getEditAdver'
     })
   },
   methods: {
-    ...mapMutations(['']),
     ...mapActions(['saveAdvert', 'handleAvatarSuccess']),
+    validateFn (formName) {
+      if (this.BanForm.type === 1) {
+        if (!this.BanForm.httpUrl) {
+          this.$message({
+            message: '请上传图片',
+            type: 'warning'
+          })
+          return false
+        }
+      } else {
+        if (!this.BanForm.content) {
+          this.$message({
+            message: '请填写弹屏内容',
+            type: 'warning'
+          })
+          return false
+        }
+      }
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.saveAdvert()
+        } else {
+          return false
+        }
+      })
+    },
     reset (formName) {
       this.$refs[formName].resetFields()
     },

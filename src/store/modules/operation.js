@@ -1,27 +1,24 @@
 
 import * as types from '../mutation-types'
 import api from '../../api'
+// import { MESSAGE } from '../../components/meta/meta'
+// 会员列表-父级分类
 const parentCategory = []
+// 广告管理-分页/搜索信息
 const searchAdverForm = {
   currentPage: 1, // 当前页
   pageSize: 10, // 一页有多少条
   title: '',
   type: ''
 }
+// 广告管理-列表
 const adverList = {
   total: '',
   list: []
 }
-// const editAdver = {
-//   content: '',
-//   iconUrl: '',
-//   id: 0,
-//   link: '',
-//   title: ''
-// }
+// 广告管理-编辑/添加表单
 const editAdver = {}
 const state = {
-  // userInfo
   parentCategory,
   searchAdverForm,
   adverList,
@@ -48,8 +45,15 @@ const mutations = {
     state.adverList.total = data.total
     state.adverList.list = [...data.list]
   },
+  // 广告管理-添加
+  [types.SAVE_ADD_ADVER] (state, data) {
+    state.editAdver = Object.assign({}, data, {iconUrl: ''}, {httpUrl: ''})
+  },
+  // 广告管理-编辑
+  // (注意iconUrl在没有修改图片的时候，iconUrl为空，在调用接口的时候就可以过滤掉iconUrl，不做提交，图片路径就不会出错，
+  // 否则，data里的iconURL是http路径，会做重复提交，返回list的图片路径就会出错)
   [types.SAVE_EDIT_ADVER] (state, data) {
-    state.editAdver = Object.assign({}, data, {httpUrl: data.iconUrl})
+    state.editAdver = Object.assign({}, data, {iconUrl: ''}, {httpUrl: data.iconUrl}, {time: [data.startTime, data.endTime]})
   },
   [types.SAVE_IMG_ADVER] (state, res) {
     state.editAdver.iconUrl = res.data.iconUrl
@@ -57,18 +61,7 @@ const mutations = {
   }
 }
 const actions = {
-  // 邀请列表
-  async add ({commit}, params) {
-    await api.addApi(params)
-    /* global vm */
-    vm.$message({
-      message: '添加成功',
-      type: 'success'
-    })
-    setTimeout(() => {
-      vm.$router.push('/member/list')
-    }, 800)
-  },
+  /* global vm */
   // 启用/禁用
   async bannerDisable ({commit}, params) {
     await api.bannerDisableApi(params)
@@ -114,7 +107,8 @@ const actions = {
   // 广告管理-添加
   addAdverFn ({commit}) {
     vm.$router.push('/operation/advertadd')
-    commit(types.SAVE_EDIT_ADVER, {id: '', type: 1})
+    // commit(types.SAVE_EDIT_ADVER, {id: '', type: 1}, {time: []})
+    commit(types.SAVE_ADD_ADVER, {id: '', type: 1})
   },
   // 广告管理-编辑
   editAdverFn ({commit}, row) {
@@ -123,17 +117,22 @@ const actions = {
   },
   // 广告管理-编辑-保存
   async saveAdvert ({commit, state}) {
+    let startTime = Date.parse(state.editAdver.time[0])
+    let endTime = Date.parse(state.editAdver.time[1])
+    state.editAdver = Object.assign(state.editAdver, {startTime: startTime}, {endTime: endTime})
     if (state.editAdver.id) {
-      await api.advertEditApi(state.editAdver)
+      let pam = {}
+      for (let i in state.editAdver) {
+        if (state.editAdver[i]) {
+          pam[i] = state.editAdver[i]
+        }
+      }
+      await api.advertEditApi(pam)
       vm.$message({
         message: '修改成功',
         type: 'success'
       })
     } else {
-      let startTime = Date.parse(state.editAdver.time[0])
-      let endTime = Date.parse(state.editAdver.time[1])
-      state.editAdver = Object.assign(state.editAdver, {startTime: startTime}, {endTime: endTime})
-      console.log(state.editAdver)
       await api.advertAddApi(state.editAdver)
       vm.$message({
         message: '添加成功',
@@ -156,6 +155,7 @@ const actions = {
       dispatch('advertList', state.searchAdverForm)
     }, 800)
   },
+  // 广告管理-图片上传
   handleAvatarSuccess ({commit}, res) {
     if (res.code === 200) {
       commit(types.SAVE_IMG_ADVER, res)

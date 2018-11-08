@@ -6,42 +6,67 @@
           <el-breadcrumb-item>手工发放次数</el-breadcrumb-item>
         </el-breadcrumb>
     </div>
-    <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px" style="width:50%;">
+    <el-form ref="form" :model="BanForm" label-width="80px" style="width:50%;">
       <!-- <el-form-item label="发放名目">
-        <el-input v-model="ruleForm.name" autocomplete="off" placeholder="手工发放名目"></el-input>
+        <el-input v-model="BanForm.name" autocomplete="off" placeholder="手工发放名目"></el-input>
       </el-form-item> -->
       <el-form-item label="发放类型">
-        <el-radio-group v-model="ruleForm.grantType">
+        <el-radio-group v-model="BanForm.grantType">
           <el-radio :label=1>所有会员</el-radio>
           <el-radio :label=2>指定会员</el-radio>
         </el-radio-group>
       </el-form-item>
       <transition name="fade">
-        <div v-show="ruleForm.grantType == 2">
-          <i style="color: #f56c6c;position:absolute;z-index:10;padding-top:12px;padding-left:2px;">*</i>
-          <el-form-item label="会员编号">
+        <div v-show="BanForm.grantType == 2">
+          <el-form-item label=" ">
             <el-input
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 4}"
               placeholder="请输入会员编号"
-              v-model="ruleForm.toUsers">
+              v-model="BanForm.toUsers">
             </el-input>
             <i style="font-size: 13px;color: #999;">请用空格或逗号隔开</i>
           </el-form-item>
         </div>
+        <!-- <div v-show="BanForm.grantType == 2">
+          <el-form-item label="搜索会员">
+            <el-autocomplete
+              class="inline-input"
+              v-model="searchText"
+              :fetch-suggestions="querySearch"
+              placeholder="请输入会员账号"
+              @select="handleSelect"
+            ></el-autocomplete>
+            <el-button size="mini" type="primary">添加</el-button>
+          </el-form-item>
+          <el-form-item label=" ">
+            <ul class="flex flex-a-c m-ul">
+              <li>2233<i class="el-icon-close"></i></li>
+              <li>付款<i class="el-icon-close"></i></li>
+              <li>222115533<i class="el-icon-close"></i></li>
+              <li>付款<i class="el-icon-close"></i></li>
+            </ul>
+          </el-form-item>
+        </div> -->
       </transition>
       <el-form-item label="奖励类型">
-        <el-select v-model="ruleForm.rewardType">
+        <el-select v-model="BanForm.rewardType">
           <el-option v-for="(v,i) in types" :key="i" :value="v.value" :label="v.label"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="奖励次数" prop="num">
-        <el-input v-model="ruleForm.num" autocomplete="off" type="number">
+      <!-- <el-form-item label="发放时间">
+        <el-date-picker
+          v-model="BanForm.time"
+          type="datetime">
+        </el-date-picker>
+      </el-form-item> -->
+      <el-form-item label="奖励次数">
+        <el-input v-model="BanForm.num" autocomplete="off">
           <template slot="append">次</template>
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click.native="submitForm('ruleForm')">保存</el-button>
+        <el-button type="primary" @click.native="harvestGrant">保存</el-button>
         <el-button @click.native="cancel">取消</el-button>
       </el-form-item>
     </el-form>
@@ -61,16 +86,14 @@ export default {
       searchText: '',
       breadcrumbText: '', // 当前面包屑的文本('编辑'，'增加')
       types: AVAILABLE_TYPE,
-      ruleForm: {
+      BanForm: {
         grantType: 1, // 发放类型
         toUsers: '', // 指定成员编号
         rewardType: 1, // 观看/下载
         num: '' // 奖励次数
-      },
-      rules: {
-        num: [
-          { required: true, validator: this.$global.valiNum, trigger: 'blur' }
-        ]
+        // name: '',
+        // imageUrl: '' // 头像
+        // time: '',
       }
     }
   },
@@ -86,34 +109,19 @@ export default {
     cancel () {
       this.$router.go(-1)
     },
-    submitForm (formName) {
-      if (this.ruleForm.grantType === 2) {
-        if (!this.ruleForm.toUsers) {
-          this.$message({
-            message: '请填写会员编号',
-            type: 'warning'
-          })
-          return false
+    harvestGrant () {
+      let pam = {}
+      for (let i in this.BanForm) {
+        if (this.BanForm[i]) {
+          pam[i] = this.BanForm[i]
         }
       }
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          let pam = {}
-          for (let i in this.ruleForm) {
-            if (this.ruleForm[i]) {
-              pam[i] = this.ruleForm[i]
-            }
+      this.api.harvestGrantApi(pam)
+        .then((res) => {
+          if (res.code === 200) {
+            this.$router.push('/operation/wd')
           }
-          this.api.harvestGrantApi(pam)
-            .then((res) => {
-              if (res.code === 200) {
-                this.$router.push('/operation/wd')
-              }
-            })
-        } else {
-          return false
-        }
-      })
+        })
     },
     handleSelect (item) {
       console.log(item)

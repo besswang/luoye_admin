@@ -63,6 +63,9 @@
         align="center"
         property="createTime"
         label="操作时间">
+        <template slot-scope="scope">
+          {{timeFn(scope.row.createTime)}}
+        </template>
       </el-table-column>
     </el-table>
     <el-dialog title='开启不限次数观看' :visible.sync="dialogFormVisible">
@@ -113,33 +116,21 @@ export default {
       types: SOURCE_TYPE,
       sourceType: '',
       userName: '',
-      tableData: [{
-        id: 1,
-        date: '2016-05-02',
-        tel: '15057187176',
-        name: '注册',
-        img: 'http://img3.imgtn.bdimg.com/it/u=108228188,2741176027&fm=26&gp=0.jpg',
-        title: '上海市普陀区金沙江路 1518 弄',
-        bonum: '10',
-        shounum: '11',
-        freeze: true
-      }, {
-        id: 2,
-        date: '2016-05-04',
-        tel: '15057187177',
-        name: '批量发放',
-        img: 'http://img1.3lian.com/2015/a1/63/d/121.jpg',
-        title: '上海市普陀区金沙江路 1517 弄',
-        bonum: '20',
-        shounum: '22',
-        freeze: false
-      }]
+      tableData: []
     }
   },
   mounted () {
     this.getList()
   },
   methods: {
+    // 转时间格式
+    timeFn (val) {
+      if (val) {
+        return this.$global.formatDate(new Date(val), 'YYYY-MM-DD HH:mm:ss')
+      } else {
+        return ''
+      }
+    },
     sourceTypeFn (val) {
       switch (val) {
         case '1':

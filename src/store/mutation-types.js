@@ -5,4 +5,5 @@ export const SAVE_CURRENT_CATEGORY = '/member/SAVE_CURRENT_CATEGORY' // 选中�
 export const SAVE_PARENT_CATEGORY = '/operation/SAVE_PARENT_CATEGORY' // 父级分类
 export const SAVE_ADVER_LIST = '/operation/SAVE_ADVER_LIST' // 广告列表
 export const SAVE_EDIT_ADVER = '/operation/SAVE_EDIT_ADVER' // 广告列表-编辑
+export const SAVE_ADD_ADVER = '/operation/SAVE_ADD_ADVER' // 广告列表-添加
 export const SAVE_IMG_ADVER = '/operation/SAVE_IMG_ADVER' // 广告列表-编辑-上传图片

@@ -28,3 +28,21 @@ export const MEMBER_TYPE = [
   {value: 0, label: '未冻结'},
   {value: 1, label: '冻结'}
 ]
+export const MESSAGE = {
+  operateSuccess: {
+    message: '操作成功',
+    type: 'success'
+  },
+  modifySuccess: {
+    message: '修改成功',
+    type: 'success'
+  },
+  addSuccess: {
+    message: '添加成功',
+    type: 'success'
+  },
+  delSuccess: {
+    message: '删除成功',
+    type: 'success'
+  }
+}
