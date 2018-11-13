@@ -15,6 +15,9 @@
               <el-menu-item index="/video/list">视频列表</el-menu-item>
               <!-- <el-menu-item index="1-2">视频编辑</el-menu-item> -->
             </el-menu-item-group>
+            <!-- <el-menu-item-group>
+              <el-menu-item index="/video/teleplay">剧集视频管理</el-menu-item>
+            </el-menu-item-group> -->
           </el-submenu>
           <el-submenu index="2">
             <template slot="title">

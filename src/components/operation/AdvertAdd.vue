@@ -7,7 +7,7 @@
         </el-breadcrumb>
     </div>
     <el-form ref="BanForm" :model="BanForm" :rules="rules" label-width="80px" style="width:50%;">
-      <el-form-item label="添加类型">
+      <el-form-item label="类型">
         <el-radio-group v-model="BanForm.type">
           <el-radio v-for="(v,i) in types" :key="i" :label="v.name">{{v.label}}</el-radio>
         </el-radio-group>

@@ -38,6 +38,10 @@ export default new Router({
           component: components('video/AddVlistWeb')
         },
         {
+          path: '/video/teleplay',
+          component: components('video/Teleplay')
+        },
+        {
           path: '/member/list',
           component: components('member/Mlist')
         },

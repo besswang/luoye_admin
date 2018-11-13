@@ -46,3 +46,23 @@ export const MESSAGE = {
     type: 'success'
   }
 }
+export const SIDE_MENU = [
+  {
+    menuTitle: '视频',
+    children: [
+      {
+        subMenuTitle: '视频列表',
+        path: '/video/list'
+      }
+    ]
+  },
+  {
+    menuTitle: '会员',
+    children: [
+      {
+        subMenuTitle: '会员列表',
+        path: '/member/list'
+      }
+    ]
+  }
+]

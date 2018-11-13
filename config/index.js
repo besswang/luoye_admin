@@ -12,8 +12,9 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/luoye_admin':{
-        // target: 'http://192.168.0.139:80/luoye_admin',
-        target: 'http://47.98.216.251/luoye_admin',
+        // target: 'http://192.168.0.139:80/luoye_admin', // 本地服务器
+        target: 'http://47.98.216.251/luoye_admin', // 测试服务器
+        // target: 'http://3.16.108.241/luoye_admin', // AWS服务器
         changeOrigin: true,
         pathRewrite: {
           '^/luoye_admin':''
